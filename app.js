@@ -1,7 +1,8 @@
 (() => {
   const root = document.querySelector('#root');
   const cafeSourceRoot = '/cafe-chico-source';
-  const cafeMenuSource = `${cafeSourceRoot}/menu.html`;
+  const cafeSourceFallback = 'https://ccconan.github.io/cafe-chico-website';
+  let activeSourceRoot = cafeSourceRoot;
   const ocrLibraryUrl = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
   const ocrLanguageUrl = 'https://tessdata.projectnaptha.com/4.0.0_fast';
   const pilotSlugs = [
@@ -43,7 +44,7 @@
   const escape = (value = '') => String(value).replace(/[&<>'"]/g, (char) => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' })[char]);
   const button = (label, action, extra = '') => `<button type="button" class="button ${extra}" data-action="${action}">${label}</button>`;
   const formatPrice = (value) => Number.isFinite(Number(value)) ? `£${Number(value).toFixed(2)}` : '未提供';
-  const sourceImageUrl = (imagePath) => `${cafeSourceRoot}/${String(imagePath || '').replace(/^\/+/, '')}`;
+  const sourceImageUrl = (imagePath) => `${activeSourceRoot}/${String(imagePath || '').replace(/^\/+/, '')}`;
   const normalized = (value = '') => String(value).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 
   function image(item, className) {
@@ -380,22 +381,28 @@
   }
 
   async function loadCafeMenu() {
-    try {
-      const response = await fetch(cafeMenuSource, { cache: 'no-store' });
-      if (!response.ok) throw new Error(`Menu source returned ${response.status}`);
-      const html = await response.text();
-      const declaration = 'window.__menuData__ = ';
-      const declarationStart = html.indexOf(declaration);
-      const arrayStart = html.indexOf('[', declarationStart);
-      const arrayEnd = html.indexOf('\n];', arrayStart);
-      if (declarationStart < 0 || arrayStart < 0 || arrayEnd < 0) throw new Error('Menu data declaration is unavailable');
-      const records = JSON.parse(html.slice(arrayStart, arrayEnd + 2));
-      pilotRecords = selectPilotRecords(records);
-      if (pilotRecords.length < 10) throw new Error('Fewer than ten usable source records were found');
-      sourceStatus = 'ready';
-    } catch (error) {
-      sourceStatus = 'error';
-      console.error('Cafe Chico source load failed:', error);
+    for (const root of [cafeSourceRoot, cafeSourceFallback]) {
+      try {
+        const response = await fetch(`${root}/menu.html`, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`Menu source returned ${response.status}`);
+        const html = await response.text();
+        const declaration = 'window.__menuData__ = ';
+        const declarationStart = html.indexOf(declaration);
+        const arrayStart = html.indexOf('[', declarationStart);
+        const arrayEnd = html.indexOf('\n];', arrayStart);
+        if (declarationStart < 0 || arrayStart < 0 || arrayEnd < 0) throw new Error('Menu data declaration is unavailable');
+        const records = JSON.parse(html.slice(arrayStart, arrayEnd + 2));
+        pilotRecords = selectPilotRecords(records);
+        if (pilotRecords.length < 10) throw new Error('Fewer than ten usable source records were found');
+        activeSourceRoot = root;
+        sourceStatus = 'ready';
+        break;
+      } catch (error) {
+        if (root === cafeSourceFallback) {
+          sourceStatus = 'error';
+          console.error('Cafe Chico source load failed:', error);
+        }
+      }
     }
     render();
   }
