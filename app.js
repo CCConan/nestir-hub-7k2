@@ -1,6 +1,7 @@
 (() => {
   const root = document.querySelector('#root');
   const cafeSourceRoot = '/cafe-chico-source';
+  const cafeApiRoot = 'https://menu-api.conanchan0217.workers.dev';
   const cafeSourceFallback = 'https://ccconan.github.io/cafe-chico-website';
   let activeSourceRoot = cafeSourceRoot;
   const ocrLibraryUrl = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
@@ -20,12 +21,16 @@
   let cameraSession = 0;
   let ocrStatus = 'idle';
   let ocrWorker = null;
-  let ocrTimer = null;
   let ocrInFlight = false;
   let ocrCanvas = null;
   let ocrNote = '';
   let ocrError = '';
-  let candidate = { id: null, readings: 0, confidence: 0, evidence: '' };
+  let toolMode = 'menu'; // 'menu' | 'item'
+  let scanState = 'idle'; // 'idle' | 'reading' | 'nomatch'
+  let lastReadText = '';
+  let itemSignatures = null;
+  let itemCandidates = [];
+  let videoEl = null;
 
   const icon = (name) => {
     const paths = {
@@ -95,11 +100,11 @@
   }
 
   function landing() {
-    return `<main class="page page--landing">${header()}<section class="landing-content"><div class="landing-copy"><h1>Explore the menu.</h1><p>Use your camera to find dishes, menu prices and their source descriptions.</p></div><article class="venue-card"><div class="venue-card__scene" aria-hidden="true"><span>CAFE<br/>CHICO</span></div><div class="venue-card__body"><div><h2>Cafe Chico</h2><p>${sourceMessage()}</p></div>${button(`${icon('camera')}Scan a menu`, 'scan', sourceStatus !== 'ready' ? 'button--loading' : '')}</div></article><p class="privacy-note">Menu frames stay on this device. The text reader runs locally in the browser.</p></section><footer>Powered by <strong>NESTIR</strong></footer></main>`;
+    return `<main class="page page--landing">${header()}<section class="landing-content"><div class="landing-copy"><h1>Explore the menu.</h1><p>Take a photo of a menu name to see the dish, its menu price and the source description. In item mode, PopList matches the item\u2019s appearance against the database.</p></div><article class="venue-card"><div class="venue-card__scene" aria-hidden="true"><span>CAFE<br/>CHICO</span></div><div class="venue-card__body"><div><h2>Cafe Chico</h2><p>${sourceMessage()}</p></div>${button(`${icon('camera')}Scan a menu`, 'scan', sourceStatus !== 'ready' ? 'button--loading' : '')}</div></article><p class="privacy-note">Captures stay on this device. The text reader and visual match run locally in the browser.</p></section><footer>Powered by <strong>NESTIR</strong></footer></main>`;
   }
 
   function cameraBackdrop() {
-    if (cameraStream) return '<video class="camera-feed" data-camera-feed autoplay muted playsinline aria-label="Live rear camera preview"></video>';
+    if (cameraStream) return '';
     return '<div class="paper-menu" aria-hidden="true"><span>CAFE CHICO</span><i></i><i></i><i></i><i></i><i></i></div>';
   }
 
@@ -107,41 +112,70 @@
     return `<div class="camera-message">${icon(iconName)}<h1>${heading}</h1><p>${message}</p>${actions}</div>`;
   }
 
-  function readyToScan() {
-    const check = candidate.id ? `Checking “${escape(candidate.evidence)}” (${candidate.readings}/2)…` : (ocrNote || 'Looking for a Cafe Chico menu name…');
-    return `<div class="scan-guide scan-guide--processing" aria-hidden="true"><span></span></div><div class="camera-action-tray"><p>${check}</p><span class="camera-wait" aria-live="polite">Reading text from the live camera automatically. Hold the menu steady.</span></div>`;
+  function captureReady() {
+    const prompt = toolMode === 'menu'
+      ? (ocrNote || '對準餐牌上的菜名，然後按「拍攝」')
+      : (ocrNote || '把物品放在取景框中央，然後按「拍攝」');
+    const privacy = toolMode === 'menu'
+      ? '文字辨識在裝置內進行，不會上載相機影格。'
+      : '視覺比對在裝置內進行，不會上載相機影格。';
+    return `<div class="viewfinder" aria-hidden="true"></div><div class="camera-action-tray"><p>${escape(prompt)}</p><div class="camera-shutter-row"><button type="button" class="button button--shutter" data-action="capture" aria-label="拍攝">${icon('camera')}</button></div><span class="camera-wait">${privacy}</span></div>`;
+  }
+
+  function menuNoMatch() {
+    const preview = lastReadText || '（沒有讀到清晰文字）';
+    return `<div class="camera-action-tray"><p><strong>已讀到文字：</strong>“${escape(preview)}”</p><p class="camera-wait">這幀沒有對應到 Cafe Chico 的 ${pilotRecords.length} 道試點餐點（或信心不足）。</p><div class="camera-shutter-row">${button('重拍', 'capture', 'button--secondary')}<button class="text-button" data-go="/places/cafe-chico/manage">查看完整餐牌</button></div></div>`;
+  }
+
+  function itemNoMatch() {
+    return `<div class="camera-action-tray"><p><strong>沒有外型相近的物品</strong></p><p class="camera-wait">取景框內沒有對應到資料庫中的試點物品。把物品放在框中央、光線充足再試。</p><div class="camera-shutter-row">${button('重拍', 'capture', 'button--secondary')}</div></div>`;
+  }
+
+  function itemCandidatesView() {
+    const list = itemCandidates.map(({ record, distance }) => `<button class="item-candidate" data-action="pick-item" data-slug="${escape(record.slug)}"><img src="${escape(record.imageUrl)}" alt="" data-image-fallback="true"/><span class="item-candidate__body"><strong>${escape(record.name)}</strong><span>${escape(record.price)} · ${escape(record.category)}</span></span><span class="item-candidate__match">${Math.max(0, Math.round((1 - distance) * 100))}%</span></button>`).join('');
+    return `<div class="item-candidates"><p class="item-candidates__title">外型相近的物品（視覺比對）</p><div class="item-candidates__list">${list}</div><button class="text-button" data-action="capture">重拍</button></div>`;
   }
 
   function scanResult() {
-    return `<div class="scan-guide scan-guide--found" aria-hidden="true"><span></span></div><div class="ocr-box"><span>${escape(candidate.evidence || dish.name)}</span></div><article class="scan-result">${image(dish, 'scan-image')}<span class="field-label scan-result__test-note">Live camera text match</span><h1>${escape(dish.name)}</h1><p class="scan-result__evidence">Matched menu text: “${escape(candidate.evidence || dish.name)}”</p><span class="field-label">Menu price</span><strong>${escape(dish.price)}</strong><span class="field-label">Menu description</span><p>${escape(dish.description)}</p>${button('View dish', 'detail')}<button class="text-button scan-again" data-action="toggle">Keep scanning</button></article>`;
+    const evidence = dish.name;
+    return `<div class="ocr-box"><span>${escape(evidence)}</span></div><article class="scan-result">${image(dish, 'scan-image')}<span class="field-label scan-result__test-note">Captured menu text match</span><h1>${escape(dish.name)}</h1><p class="scan-result__evidence">Matched menu text: “${escape(evidence)}”</p><span class="field-label">Menu price</span><strong>${escape(dish.price)}</strong><span class="field-label">Menu description</span><p>${escape(dish.description)}</p>${button('View dish', 'detail')}${button('拍攝下一道', 'capture', 'button--secondary')}</article>`;
   }
 
   function scannerContent() {
     if (sourceStatus !== 'ready') {
-      return cameraMessage(sourceStatus === 'error' ? 'warning' : 'camera', sourceStatus === 'error' ? 'Menu data unavailable' : 'Loading menu data', sourceStatus === 'error' ? 'The local Cafe Chico website source could not be read. Return home and retry.' : 'Reading the existing Cafe Chico website menu for this live OCR test.', sourceStatus === 'error' ? button('Return home', 'home') : '');
+      return cameraMessage(sourceStatus === 'error' ? 'warning' : 'camera', sourceStatus === 'error' ? 'Menu data unavailable' : 'Loading menu data', sourceStatus === 'error' ? 'The Cafe Chico menu source could not be read. Return home and retry.' : 'Reading the Cafe Chico menu for this capture test.', sourceStatus === 'error' ? button('Return home', 'home') : '');
     }
     if (detected) return scanResult();
+    if (scanState === 'reading') return cameraMessage('camera', toolMode === 'menu' ? 'Reading menu text…' : 'Comparing appearance…', 'Processing this capture on your device.');
+    if (toolMode === 'item' && scanState === 'nomatch') return itemNoMatch();
+    if (toolMode === 'item' && itemCandidates.length) return itemCandidatesView();
+    if (scanState === 'nomatch') return menuNoMatch();
     if (cameraMode === 'requesting') return cameraMessage('camera', 'Waiting for camera access', 'Approve the browser prompt to use the rear camera. The preview stays on this device.');
-    if (cameraMode === 'ready' && ocrStatus === 'loading') return cameraMessage('camera', 'Preparing text reader', 'The first use downloads an English reading model to this browser. Menu images are not uploaded.');
-    if (cameraMode === 'ready' && (ocrStatus === 'ready' || ocrStatus === 'reading')) return readyToScan();
-    if (cameraMode === 'ready' && ocrStatus === 'error') return cameraMessage('warning', 'Text reader could not start', escape(ocrError || 'Try again with a network connection for the first local model download.'), button('Retry text reader', 'ocr'));
+    if (cameraMode === 'ready' && toolMode === 'menu' && ocrStatus === 'loading') return cameraMessage('camera', 'Preparing text reader', 'The first use downloads an English reading model to this browser. Menu images are not uploaded.');
+    if (cameraMode === 'ready' && toolMode === 'menu' && ocrStatus === 'error') return cameraMessage('warning', 'Text reader could not start', escape(ocrError || 'Try again with a network connection for the first local model download.'), button('Retry text reader', 'ocr'));
     if (cameraMode === 'denied') return cameraMessage('warning', 'Camera permission was not granted', 'Enable camera access for this secure site in the browser, then try again.', button('Try camera again', 'camera'));
     if (cameraMode === 'insecure') return cameraMessage('warning', 'A secure link is required', 'Phone cameras only work on HTTPS. This local address is for layout testing only.');
     if (cameraMode === 'unsupported' || cameraMode === 'error') return cameraMessage('warning', 'Camera is unavailable here', 'This browser cannot start a camera preview for this test.');
-    return cameraMessage('camera', 'Ready to use the rear camera', 'Start the camera once. After permission, PopList reads the menu automatically and only opens a card when live text matches one of the Cafe Chico pilot dishes.', button(`${icon('camera')}Use rear camera`, 'camera'));
+    if (cameraMode === 'ready') return captureReady();
+    return cameraMessage('camera', 'Ready to use the rear camera', 'Start the camera once, then press 拍攝 to read a menu name or match an item against the database.', button(`${icon('camera')}Use rear camera`, 'camera'));
   }
 
   function scannerStatus() {
-    if (detected) return 'Live menu text matched';
+    if (detected) return 'Captured menu text matched';
+    if (scanState === 'reading') return toolMode === 'menu' ? 'Reading menu text' : 'Matching item appearance';
+    if (scanState === 'nomatch') return toolMode === 'menu' ? 'Menu text read — no pilot match' : 'No close item match';
+    if (toolMode === 'item') return 'Item visual match';
     if (ocrStatus === 'loading') return 'Preparing on-device text reader';
-    if (ocrStatus === 'reading') return 'Reading live menu text';
-    if (ocrStatus === 'ready') return 'Automatic live scan';
+    if (ocrStatus === 'error') return 'Text reader unavailable';
+    if (cameraMode === 'ready') return 'Manual capture mode';
     return 'Camera test';
   }
 
   function scanner() {
     if (detail && dish) return dishDetail();
-    return `<main class="camera-page"><div class="camera-page__chrome"><button class="icon-button" data-go="/" aria-label="Close scan">${icon('close')}</button><span>Cafe Chico</span>${mark(true)}</div><section class="camera-viewport ${cameraStream ? 'camera-viewport--live' : ''}" aria-label="Menu camera viewport">${cameraBackdrop()}<div class="camera-vignette" aria-hidden="true"></div>${scannerContent()}</section><div class="camera-page__bottom"><p>${scannerStatus()}</p>${sourceStatus === 'ready' && !detected ? '<span>10-dish pilot · no manual dish selection</span>' : ''}</div></main>`;
+    const modeSwitch = cameraMode === 'ready' && !detected && scanState !== 'reading'
+      ? `<div class="mode-switch" role="group" aria-label="Tool mode"><button type="button" data-mode="menu" class="${toolMode === 'menu' ? 'is-active' : ''}">餐牌</button><button type="button" data-mode="item" class="${toolMode === 'item' ? 'is-active' : ''}">物品</button></div>` : '';
+    return `<main class="camera-page"><div class="camera-page__chrome"><button class="icon-button" data-go="/" aria-label="Close scan">${icon('close')}</button><span>Cafe Chico</span>${mark(true)}</div><section class="camera-viewport ${cameraStream ? 'camera-viewport--live' : ''}" aria-label="Menu camera viewport">${cameraBackdrop()}${modeSwitch}<div class="camera-vignette" aria-hidden="true"></div>${scannerContent()}</section><div class="camera-page__bottom"><p>${scannerStatus()}</p>${sourceStatus === 'ready' && !detected ? `<span>手動拍攝 · ${pilotRecords.length} 道試點餐點</span>` : ''}</div></main>`;
   }
 
   function dishDetail() {
@@ -151,7 +185,7 @@
   function manager() {
     const records = pilotRecords.map((record) => `<div class="menu-row"><span>${escape(record.name)}</span><span>${escape(record.price)}</span><span>${escape(record.category)}</span><span class="status status--published">OCR pilot</span></div>`).join('');
     const body = sourceStatus === 'ready' ? records : `<div class="empty-row">${escape(sourceMessage())}</div>`;
-    return `<main class="manager page">${header('<button class="quiet-link" data-go="/">Public view</button>')}<div class="manager-layout manager-layout--source"><section class="manager-list"><div class="section-heading"><div><h1>Live OCR pilot menu</h1><p>All ten records are eligible for automatic matching. This page cannot preselect the scanner result.</p></div>${icon('list')}</div><div class="matte-card menu-table"><div class="menu-table__header"><span>Dish</span><span>Price</span><span>Category</span><span>Status</span></div>${body}</div></section><aside class="editor matte-card source-note"><div class="section-heading"><div><span class="field-label">Source-connected test</span><h2>Read only</h2></div>${icon('edit')}</div><p>Names, prices, visible descriptions and image paths are read from the existing Cafe Chico menu page.</p><p>Live OCR only opens a result after two consecutive readings agree. Merchant editing and SN Account remain later features.</p></aside></div></main>`;
+    return `<main class="manager page">${header('<button class="quiet-link" data-go="/">Public view</button><a class="quiet-link" href="merchant.html">商戶介面</a>')}<div class="manager-layout manager-layout--source"><section class="manager-list"><div class="section-heading"><div><h1>Capture pilot menu</h1><p>All ten records are eligible for matching. This page cannot preselect the scanner result.</p></div>${icon('list')}</div><div class="matte-card menu-table"><div class="menu-table__header"><span>Dish</span><span>Price</span><span>Category</span><span>Status</span></div>${body}</div></section><aside class="editor matte-card source-note"><div class="section-heading"><div><span class="field-label">Source-connected test</span><h2>Read only</h2></div>${icon('edit')}</div><p>Names, prices, visible descriptions and image paths are read from the Cafe Chico menu data source.</p><p>One capture reads the menu text; a dish card only opens when the reading is confident. Merchant editing and SN Account remain later features.</p></aside></div></main>`;
   }
 
   function attachImageFallbacks() {
@@ -164,22 +198,33 @@
   }
 
   function attachCameraFeed() {
-    const video = root.querySelector('[data-camera-feed]');
-    if (!video || !cameraStream) return;
-    video.srcObject = cameraStream;
-    video.play().catch(() => {});
-  }
-
-  function stopAutoScan() {
-    if (ocrTimer) clearInterval(ocrTimer);
-    ocrTimer = null;
+    const viewport = root.querySelector('.camera-viewport');
+    if (!viewport) return;
+    if (cameraStream) {
+      if (!videoEl) {
+        videoEl = document.createElement('video');
+        videoEl.className = 'camera-feed';
+        videoEl.autoplay = true;
+        videoEl.muted = true;
+        videoEl.playsInline = true;
+        videoEl.setAttribute('aria-label', 'Live rear camera preview');
+      }
+      if (!videoEl.isConnected) viewport.prepend(videoEl);
+      if (videoEl.srcObject !== cameraStream) videoEl.srcObject = cameraStream;
+      videoEl.play().catch(() => {});
+    } else if (videoEl) {
+      videoEl.srcObject = null;
+      videoEl.remove();
+    }
   }
 
   function resetRecognition() {
     detected = false;
     dish = null;
-    candidate = { id: null, readings: 0, confidence: 0, evidence: '' };
     ocrNote = '';
+    scanState = 'idle';
+    lastReadText = '';
+    itemCandidates = [];
   }
 
   function loadOcrLibrary() {
@@ -204,7 +249,6 @@
     if (ocrWorker) {
       ocrStatus = 'ready';
       render();
-      startAutoScan();
       return;
     }
     if (ocrStatus === 'loading') return;
@@ -217,9 +261,8 @@
       await ocrWorker.setParameters({ tessedit_pageseg_mode: '11' });
       if (!cameraStream || !isScanRoute()) return;
       ocrStatus = 'ready';
-      ocrNote = 'Looking for a Cafe Chico menu name…';
+      ocrNote = '對準餐牌上的菜名，然後按「拍攝」';
       render();
-      startAutoScan();
     } catch (error) {
       console.error('On-device OCR setup failed:', error);
       ocrWorker = null;
@@ -268,40 +311,60 @@
     return best;
   }
 
-  async function scanFrame() {
-    if (!ocrWorker || !cameraStream || detected || ocrInFlight || !isScanRoute()) return;
+  function frameForCapture() {
+    const video = root.querySelector('.camera-feed');
+    if (!video || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !video.videoWidth || !video.videoHeight) return null;
+    const sourceWidth = video.videoWidth;
+    const sourceHeight = video.videoHeight;
+    const scale = Math.min(1, 640 / sourceWidth);
+    const cropX = Math.round(sourceWidth * 0.20);
+    const cropY = Math.round(sourceHeight * 0.18);
+    const cropWidth = Math.round(sourceWidth * 0.60);
+    const cropHeight = Math.round(sourceHeight * 0.64);
+    if (!ocrCanvas) ocrCanvas = document.createElement('canvas');
+    ocrCanvas.width = Math.max(1, Math.round(cropWidth * scale));
+    ocrCanvas.height = Math.max(1, Math.round(cropHeight * scale));
+    const context = ocrCanvas.getContext('2d', { alpha: false });
+    context.drawImage(video, cropX, cropY, cropWidth, cropHeight, 0, 0, ocrCanvas.width, ocrCanvas.height);
+    return ocrCanvas;
+  }
+
+  async function captureAndScan() {
+    if (toolMode === 'item') return captureAndMatchItem();
+    if (!ocrWorker || !cameraStream || ocrInFlight || detected || !isScanRoute()) return;
     const scanSession = cameraSession;
     const scanStream = cameraStream;
     const frame = frameForOcr();
     if (!frame) {
-      ocrNote = 'Waiting for a clear camera frame…';
+      ocrNote = '等待清晰的畫面…';
+      render();
       return;
     }
     ocrInFlight = true;
+    scanState = 'reading';
     ocrStatus = 'reading';
+    render();
     try {
       const result = await ocrWorker.recognize(frame);
-      if (scanSession !== cameraSession || scanStream !== cameraStream || detected || !isScanRoute()) return;
+      if (scanSession !== cameraSession || scanStream !== cameraStream || !isScanRoute()) return;
       const text = result?.data?.text || '';
       const confidence = Number(result?.data?.confidence || 0);
       const match = findMenuMatch(text, confidence);
-      if (!match) {
-        candidate = { id: null, readings: 0, confidence: 0, evidence: '' };
-        const preview = text.trim().replace(/\s+/g, ' ').slice(0, 72);
-        ocrNote = preview ? `Menu text seen: “${preview}”` : 'Looking for a clear Cafe Chico menu name…';
-      } else if (candidate.id === match.record.id) {
-        candidate = { id: match.record.id, readings: candidate.readings + 1, confidence, evidence: match.evidence };
-      } else {
-        candidate = { id: match.record.id, readings: 1, confidence, evidence: match.evidence };
-      }
-      if (candidate.readings >= 2) {
+      if (match) {
         dish = match.record;
         detected = true;
-        stopAutoScan();
+        scanState = 'idle';
+        ocrNote = '';
+      } else {
+        detected = false;
+        lastReadText = text.trim().replace(/\s+/g, ' ').slice(0, 120);
+        scanState = 'nomatch';
       }
     } catch (error) {
-      console.error('Live menu OCR failed:', error);
-      ocrNote = 'The text reader missed this frame — keep the menu steady.';
+      console.error('Menu OCR failed:', error);
+      lastReadText = '';
+      scanState = 'nomatch';
+      ocrError = '辨識這一幀失敗，請重拍。';
     } finally {
       ocrInFlight = false;
       if (!detected && ocrStatus !== 'error') ocrStatus = 'ready';
@@ -309,22 +372,139 @@
     }
   }
 
-  function startAutoScan() {
-    if (!cameraStream || !ocrWorker || detected || ocrTimer) return;
-    scanFrame();
-    ocrTimer = setInterval(scanFrame, 1500);
+  // ---- 物品模式：外型簽名 → 資料庫視覺比對（RAG-like 擷取）----
+  function itemSignatureFromCanvas(canvas) {
+    const size = 32;
+    const temp = document.createElement('canvas');
+    temp.width = size;
+    temp.height = size;
+    const ctx = temp.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(canvas, 0, 0, size, size);
+    const data = ctx.getImageData(0, 0, size, size).data;
+    const cells = 4;
+    const cell = size / cells;
+    const sig = new Float32Array(cells * cells * 4);
+    for (let cy = 0; cy < cells; cy++) {
+      for (let cx = 0; cx < cells; cx++) {
+        let r = 0, g = 0, b = 0, n = 0, e = 0;
+        const y0 = Math.round(cy * cell);
+        const y1 = Math.round((cy + 1) * cell);
+        const x0 = Math.round(cx * cell);
+        const x1 = Math.round((cx + 1) * cell);
+        for (let y = y0; y < y1; y++) {
+          for (let x = x0; x < x1; x++) {
+            const i = (y * size + x) * 4;
+            r += data[i]; g += data[i + 1]; b += data[i + 2]; n++;
+            if (y + 1 < size && x + 1 < size) {
+              const j = ((y + 1) * size + x + 1) * 4;
+              e += Math.abs(data[i] - data[j]) + Math.abs(data[i + 1] - data[j + 1]) + Math.abs(data[i + 2] - data[j + 2]);
+            }
+          }
+        }
+        const idx = (cy * cells + cx) * 4;
+        sig[idx] = r / n / 255;
+        sig[idx + 1] = g / n / 255;
+        sig[idx + 2] = b / n / 255;
+        sig[idx + 3] = e / (n * 3) / 255;
+      }
+    }
+    return sig;
+  }
+
+  function signatureDistance(a, b) {
+    let d = 0;
+    for (let i = 0; i < a.length; i++) {
+      const diff = a[i] - b[i];
+      d += diff * diff;
+    }
+    return Math.sqrt(d);
+  }
+
+  function loadSignatureImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = url;
+    });
+  }
+
+  async function buildItemSignatures() {
+    if (itemSignatures) return itemSignatures;
+    const canvas = document.createElement('canvas');
+    const out = [];
+    for (const record of pilotRecords) {
+      try {
+        const img = await loadSignatureImage(record.imageUrl);
+        canvas.width = img.naturalWidth || 320;
+        canvas.height = img.naturalHeight || 240;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        out.push({ record, sig: itemSignatureFromCanvas(canvas) });
+      } catch (error) {
+        console.warn('Signature image skipped:', record.name, error);
+      }
+    }
+    itemSignatures = out;
+    return out;
+  }
+
+  async function captureAndMatchItem() {
+    if (ocrInFlight || !cameraStream || !isScanRoute()) return;
+    const scanSession = cameraSession;
+    const scanStream = cameraStream;
+    const frame = frameForCapture();
+    if (!frame) {
+      ocrNote = '等待清晰的畫面…';
+      render();
+      return;
+    }
+    ocrInFlight = true;
+    scanState = 'reading';
+    itemCandidates = [];
+    render();
+    try {
+      const signatures = await buildItemSignatures();
+      if (scanSession !== cameraSession || scanStream !== cameraStream || !isScanRoute()) return;
+      const query = itemSignatureFromCanvas(frame);
+      const ranked = signatures
+        .map(({ record, sig }) => ({ record, distance: signatureDistance(query, sig) }))
+        .sort((a, b) => a.distance - b.distance);
+      itemCandidates = ranked.slice(0, 3);
+      const best = itemCandidates[0];
+      if (best && best.distance < 0.55) {
+        scanState = 'idle';
+      } else {
+        itemCandidates = [];
+        scanState = 'nomatch';
+      }
+    } catch (error) {
+      console.error('Item match failed:', error);
+      itemCandidates = [];
+      scanState = 'nomatch';
+    } finally {
+      ocrInFlight = false;
+      render();
+    }
   }
 
   function render() {
     root.innerHTML = path() === '/places/cafe-chico/manage' ? manager() : isScanRoute() ? scanner() : landing();
     root.querySelectorAll('[data-go]').forEach((element) => element.addEventListener('click', () => go(element.dataset.go)));
-    root.querySelectorAll('[data-action]').forEach((element) => element.addEventListener('click', () => action(element.dataset.action)));
+    root.querySelectorAll('[data-action]').forEach((element) => element.addEventListener('click', () => action(element.dataset.action, element.dataset.slug)));
+    root.querySelectorAll('[data-mode]').forEach((element) => element.addEventListener('click', () => {
+      toolMode = element.dataset.mode === 'item' ? 'item' : 'menu';
+      scanState = 'idle';
+      lastReadText = '';
+      itemCandidates = [];
+      ocrNote = '';
+      render();
+    }));
     attachImageFallbacks();
     attachCameraFeed();
   }
 
   function stopCamera() {
-    stopAutoScan();
     cameraSession += 1;
     if (cameraStream) cameraStream.getTracks().forEach((track) => track.stop());
     cameraStream = null;
@@ -365,44 +545,91 @@
     render();
   }
 
-  function keepScanning() {
-    resetRecognition();
-    startCamera();
-  }
-
-  function action(name) {
+  function action(name, slug) {
     if (name === 'scan') go('/places/cafe-chico/scan');
     if (name === 'home') go('/');
     if (name === 'camera') startCamera();
     if (name === 'ocr') prepareOcr();
-    if (name === 'toggle') keepScanning();
+    if (name === 'capture') { resetRecognition(); captureAndScan(); }
     if (name === 'detail') { detail = true; stopCamera(); render(); }
     if (name === 'back') { detail = false; cameraMode = 'idle'; render(); }
+    if (name === 'pick-item') {
+      const found = pilotRecords.find((record) => record.slug === slug);
+      if (found) {
+        dish = found;
+        detail = true;
+        stopCamera();
+        render();
+      }
+    }
+  }
+
+  function parseMenuHtml(html) {
+    const declaration = 'window.__menuData__ = ';
+    const declarationStart = html.indexOf(declaration);
+    const arrayStart = html.indexOf('[', declarationStart);
+    const arrayEnd = html.indexOf('\n];', arrayStart);
+    if (declarationStart < 0 || arrayStart < 0 || arrayEnd < 0) throw new Error('Menu data declaration is unavailable');
+    return JSON.parse(html.slice(arrayStart, arrayEnd + 2));
+  }
+
+  function acceptRecords(records) {
+    const selected = selectPilotRecords(records);
+    if (selected.length < 10) throw new Error('Fewer than ten usable source records were found');
+    pilotRecords = selected;
+    sourceStatus = 'ready';
   }
 
   async function loadCafeMenu() {
-    for (const root of [cafeSourceRoot, cafeSourceFallback]) {
-      try {
-        const response = await fetch(`${root}/menu.html`, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`Menu source returned ${response.status}`);
-        const html = await response.text();
-        const declaration = 'window.__menuData__ = ';
-        const declarationStart = html.indexOf(declaration);
-        const arrayStart = html.indexOf('[', declarationStart);
-        const arrayEnd = html.indexOf('\n];', arrayStart);
-        if (declarationStart < 0 || arrayStart < 0 || arrayEnd < 0) throw new Error('Menu data declaration is unavailable');
-        const records = JSON.parse(html.slice(arrayStart, arrayEnd + 2));
-        pilotRecords = selectPilotRecords(records);
-        if (pilotRecords.length < 10) throw new Error('Fewer than ten usable source records were found');
-        activeSourceRoot = root;
-        sourceStatus = 'ready';
-        break;
-      } catch (error) {
-        if (root === cafeSourceFallback) {
-          sourceStatus = 'error';
-          console.error('Cafe Chico source load failed:', error);
-        }
-      }
+    // 1) 本機 Cafe 網站資料夾（symlink，開發／Tailscale 測試）
+    try {
+      const response = await fetch(`${cafeSourceRoot}/menu.html`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Menu source returned ${response.status}`);
+      const html = await response.text();
+      const records = parseMenuHtml(html);
+      activeSourceRoot = cafeSourceRoot;
+      acceptRecords(records);
+      render();
+      return;
+    } catch (error) {
+      console.warn('Local cafe source unavailable:', error);
+    }
+    // 2) menu-api（Cloudflare D1 + R2 資料庫）
+    try {
+      const response = await fetch(`${cafeApiRoot}/api/venues/cafe-chico/menu`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Menu API returned ${response.status}`);
+      const payload = await response.json();
+      const records = (payload.records || []).map((item) => ({
+        id: item.id,
+        slug: item.slug,
+        name: item.name,
+        cat_name: item.cat_name,
+        cat_slug: item.cat_slug,
+        desc: item.desc,
+        price: item.price,
+        image: item.image,
+        available: item.available === true,
+      }));
+      activeSourceRoot = cafeApiRoot;
+      acceptRecords(records);
+      render();
+      return;
+    } catch (error) {
+      console.warn('Menu API unavailable:', error);
+    }
+    // 3) 公開 Cafe 網站（最後 fallback）
+    try {
+      const response = await fetch(`${cafeSourceFallback}/menu.html`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Menu source returned ${response.status}`);
+      const html = await response.text();
+      const records = parseMenuHtml(html);
+      activeSourceRoot = cafeSourceFallback;
+      acceptRecords(records);
+      render();
+      return;
+    } catch (error) {
+      sourceStatus = 'error';
+      console.error('All cafe menu sources failed:', error);
     }
     render();
   }

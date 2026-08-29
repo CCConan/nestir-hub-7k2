@@ -29,6 +29,41 @@
   z-index: 2;
 }
 
+/* 靜態取景框（四角，不移動、不閃動） */
+.viewfinder {
+  position: absolute;
+  inset: 17% 9% 24%;
+  pointer-events: none;
+  border: 2px solid rgb(var(--sn-background-rgb) / .88);
+  border-radius: 24px;
+  box-shadow: 0 0 0 1px rgb(var(--sn-ink-rgb) / .24);
+}
+
+.viewfinder::before,
+.viewfinder::after {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  content: '';
+  border-color: var(--sn-success);
+  border-style: solid;
+}
+
+.viewfinder::before {
+  top: -2px;
+  left: -2px;
+  border-width: 3px 0 0 3px;
+  border-radius: 18px 0 0;
+}
+
+.viewfinder::after {
+  right: -2px;
+  bottom: -2px;
+  border-width: 0 3px 3px 0;
+  border-radius: 0 0 18px;
+}
+
+/* 舊式掃描線：停用動畫，只保留靜態框 */
 .scan-guide {
   position: absolute;
   inset: 17% 9% 24%;
@@ -38,50 +73,12 @@
   box-shadow: 0 0 0 1px rgb(var(--sn-ink-rgb) / .24);
 }
 
-.scan-guide::before,
-.scan-guide::after {
-  position: absolute;
-  width: 28px;
-  height: 28px;
-  content: '';
-  border-color: var(--sn-success);
-  border-style: solid;
-}
-
-.scan-guide::before {
-  top: -2px;
-  left: -2px;
-  border-width: 3px 0 0 3px;
-  border-radius: 18px 0 0;
-}
-
-.scan-guide::after {
-  right: -2px;
-  bottom: -2px;
-  border-width: 0 3px 3px 0;
-  border-radius: 0 0 18px;
-}
-
 .scan-guide span {
-  position: absolute;
-  top: 12%;
-  right: 8%;
-  left: 8%;
-  height: 2px;
-  background: var(--sn-success);
-  box-shadow: 0 0 12px rgb(var(--sn-success-rgb) / .72);
+  display: none;
 }
 
 .scan-guide--processing span {
-  animation: scan-line 900ms ease-in-out infinite alternate;
-}
-
-.scan-guide--found {
-  border-color: var(--sn-success);
-}
-
-.scan-guide--found span {
-  top: 50%;
+  animation: none;
 }
 
 .camera-action-tray {
@@ -139,13 +136,117 @@
 
 .button--loading { opacity: .58; }
 
-@keyframes scan-line {
-  from { transform: translateY(0); opacity: .65; }
-  to { transform: translateY(340px); opacity: 1; }
+/* 快門按鈕與拍攝指引 */
+.camera-shutter-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
 }
+
+.button--shutter {
+  width: 68px;
+  height: 68px;
+  padding: 0;
+  border-radius: 50%;
+  border: 3px solid var(--sn-ink);
+  background: #fff;
+  color: var(--sn-ink);
+  box-shadow: var(--sn-matte-shadow), var(--sn-matte-highlight);
+}
+.button--shutter .icon { width: 30px; height: 30px; }
+.button--shutter:hover { background: var(--sn-background-secondary); }
+
+.camera-shutter-row .button--secondary {
+  min-height: 44px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.camera-reading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 10px;
+  padding: 28px;
+  color: var(--sn-ink);
+}
+.camera-reading .icon { width: 30px; height: 30px; margin: auto; color: var(--sn-blue); }
+.camera-reading p { margin: 0; font-weight: 650; }
+
+/* 餐牌／物品模式切換 */
+.mode-switch {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgb(var(--sn-ink-rgb) / .68);
+  backdrop-filter: blur(10px);
+}
+.mode-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--sn-background);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 7px 16px;
+  border-radius: 999px;
+}
+.mode-switch button.is-active { background: var(--sn-blue); color: #fff; }
+
+/* 物品視覺查詢候選 */
+.item-candidates {
+  position: absolute;
+  right: 6%;
+  bottom: 12%;
+  left: 6%;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  background: rgb(var(--sn-background-rgb) / .92);
+  border-radius: var(--sn-matte-radius);
+  box-shadow: var(--sn-matte-shadow), var(--sn-matte-highlight);
+}
+.item-candidates__title {
+  margin: 0;
+  color: var(--sn-ink);
+  font-size: 14px;
+  font-weight: 750;
+}
+.item-candidates__list { display: grid; gap: 8px; }
+.item-candidate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border: 0;
+  border-radius: 18px;
+  padding: 8px;
+  background: rgba(215, 220, 221, .7);
+  color: var(--sn-ink);
+  text-align: left;
+}
+.item-candidate img {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--sn-background-secondary);
+}
+.item-candidate__body { display: flex; flex-direction: column; gap: 2px; }
+.item-candidate__body strong { font-size: 15px; }
+.item-candidate__body span { color: var(--sn-blue); font-size: 13px; }
+.item-candidate__match { margin-left: auto; color: var(--sn-success); font-size: 12px; font-weight: 700; }
 
 @media (max-width: 700px) {
   .scan-guide { inset: 14% 7% 27%; }
+  .viewfinder { inset: 14% 7% 27%; }
   .camera-action-tray { right: 12px; bottom: 12px; left: 12px; }
   .camera-page .scan-result { top: 39%; }
 }

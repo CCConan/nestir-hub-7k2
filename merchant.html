@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>NESTIR · Cafe 商戶介面（原型）</title>
+    <link rel="stylesheet" href="src/portal.css?v=20260829-3" />
+    <link rel="stylesheet" href="src/merchant.css?v=20260829-1" />
+  </head>
+  <body class="merchant-body">
+    <main class="merchant">
+      <header class="merchant-top">
+        <a class="portal-brand" href="portal.html">
+          <span class="portal-compass" aria-hidden="true"><i></i></span>
+          <span>NESTIR</span>
+        </a>
+        <span class="merchant-badge">商戶介面原型</span>
+      </header>
+
+      <section id="authGate" class="merchant-gate">
+        <h1>Cafe Chico 資料管理</h1>
+        <p>輸入管理金鑰以讀取與更新餐點資料。<br/>原型權限（X-Admin-Key）；正式版將以唯一 SN Account 取代。</p>
+        <div class="merchant-gate__row">
+          <input id="adminKey" type="password" placeholder="管理金鑰" autocomplete="off" />
+          <button id="unlockBtn" type="button" class="portal-enter merchant-unlock">解鎖</button>
+        </div>
+        <p id="authError" class="merchant-error" hidden></p>
+      </section>
+
+      <section id="dashboard" class="merchant-dash" hidden>
+        <div class="merchant-dash__head">
+          <div>
+            <h1>Cafe Chico 餐點資料</h1>
+            <p id="venueMeta" class="merchant-meta"></p>
+          </div>
+          <button id="refreshBtn" type="button" class="merchant-quiet">重新整理</button>
+        </div>
+
+        <div class="merchant-stats">
+          <div class="merchant-stat"><strong id="statTotal">0</strong><span>餐點總數</span></div>
+          <div class="merchant-stat"><strong id="statImage">0</strong><span>有圖片</span></div>
+          <div class="merchant-stat"><strong id="statNoImage">0</strong><span>無圖片</span></div>
+          <div class="merchant-stat"><strong id="statAvailable">0</strong><span>供應中</span></div>
+        </div>
+
+        <div id="dishTable" class="merchant-table"></div>
+      </section>
+    </main>
+    <script src="src/merchant.js?v=20260829-1"></script>
+  </body>
+</html>
