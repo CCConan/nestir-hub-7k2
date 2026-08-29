@@ -1,0 +1,5 @@
+node_modules/
+cafe-chico-source
+.DS_Store
+*.log
+README.md

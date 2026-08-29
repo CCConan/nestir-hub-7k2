@@ -1,0 +1,18 @@
+{
+  "name": "@nestir/web-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 4173",
+    "build": "node -e \"console.log('Static Web prototype: no build step required.')\"",
+    "build:lobby": "esbuild src/lobby.js --bundle --minify --format=esm --outfile=lobby.bundle.js --platform=browser --target=es2022",
+    "test:lobby": "node src/lobby-smoke.mjs"
+  },
+  "dependencies": {
+    "vgpu": "0.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

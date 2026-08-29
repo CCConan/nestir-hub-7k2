@@ -1,0 +1,157 @@
+/* NESTIR 世界入口 — 外層閘門 */
+:root {
+  --portal-bg: #0A1E31;
+  --portal-ink: #142E47;
+  --portal-blue: #496576;
+  --portal-paper: #E9EAE7;
+  --portal-muted: #7E94A3;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--portal-bg);
+  color: var(--portal-paper);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", sans-serif;
+}
+
+.portal {
+  min-height: 100svh;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 22px 60px;
+  background-image:
+    linear-gradient(rgba(233, 234, 231, .04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(233, 234, 231, .04) 1px, transparent 1px);
+  background-size: 72px 72px;
+  background-position: center;
+}
+
+.portal-bar {
+  height: 72px;
+  display: flex;
+  align-items: center;
+}
+
+.portal-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--portal-paper);
+  text-decoration: none;
+  font-weight: 750;
+  letter-spacing: .17em;
+  font-size: 15px;
+}
+
+.portal-compass {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid #B9C6CE;
+  border-radius: 50%;
+}
+.portal-compass:before,
+.portal-compass:after { content: ""; position: absolute; background: #B9C6CE; }
+.portal-compass:before { width: 1px; height: calc(100% + 8px); }
+.portal-compass:after { height: 1px; width: calc(100% + 8px); }
+.portal-compass i {
+  width: 11px; height: 16px;
+  background: #347A5B;
+  clip-path: polygon(50% 0, 88% 50%, 50% 100%, 12% 50%);
+  transform: rotate(26deg);
+}
+
+.portal-hero {
+  margin-top: clamp(40px, 12vh, 120px);
+}
+
+.portal-hero h1 {
+  margin: 0 0 18px;
+  font-size: clamp(40px, 9vw, 72px);
+  letter-spacing: -.045em;
+  line-height: .98;
+  font-weight: 700;
+}
+
+.portal-hero p {
+  max-width: 460px;
+  margin: 0;
+  color: #B9C6CE;
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.portal-enter {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 34px;
+  padding: 0 26px;
+  min-height: 56px;
+  border-radius: 28px;
+  background: var(--portal-blue);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 17px;
+  transition: transform 85ms ease, background 220ms ease;
+}
+.portal-enter:hover { background: #5A7A8C; }
+.portal-enter:active { transform: scale(.95); }
+.portal-enter span { transition: transform 200ms ease; }
+.portal-enter:hover span { transform: translateX(4px); }
+
+.portal-roster {
+  margin-top: 60px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.portal-roster__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid rgba(233, 234, 231, .12);
+  border-radius: 18px;
+  background: rgba(233, 234, 231, .04);
+}
+
+.portal-roster__dot {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--c, #496576);
+  box-shadow: 0 0 12px var(--c, #496576);
+}
+
+.portal-roster__item strong { display: block; font-size: 15px; }
+.portal-roster__item em {
+  display: block;
+  font-style: normal;
+  font-size: 12.5px;
+  color: var(--portal-muted);
+  margin-top: 3px;
+}
+
+.portal-note {
+  margin: 40px 0 0;
+  color: var(--portal-muted);
+  font-size: 13px;
+  text-align: center;
+  letter-spacing: .02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-enter, .portal-enter span { transition: none; }
+}
