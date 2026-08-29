@@ -273,7 +273,7 @@
   }
 
   function frameForOcr() {
-    const video = root.querySelector('[data-camera-feed]');
+    const video = root.querySelector('.camera-feed');
     if (!video || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || !video.videoWidth || !video.videoHeight) return null;
     const sourceWidth = video.videoWidth;
     const sourceHeight = video.videoHeight;
