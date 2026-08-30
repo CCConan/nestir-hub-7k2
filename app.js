@@ -1,7 +1,21 @@
 (() => {
   const root = document.querySelector('#root');
   const cafeSourceRoot = '/cafe-chico-source';
-  const cafeApiRoot = 'https://menu-api.conanchan0217.workers.dev';
+  const cafeApiDomains = ['https://poplist.studionestir.com', 'https://menu-api.conanchan0217.workers.dev'];
+  let cafeApiRoot = cafeApiDomains[cafeApiDomains.length - 1];
+  let apiRootChecked = false;
+  // 自訂網域（poplist.studionestir.com）生效後自動優先使用；否則退回 workers.dev
+  async function ensureApiRoot() {
+    if (apiRootChecked) return cafeApiRoot;
+    for (const domain of cafeApiDomains) {
+      try {
+        const response = await fetch(`${domain}/api/health`, { cache: 'no-store' });
+        if (response.ok) { cafeApiRoot = domain; break; }
+      } catch (error) { /* try next domain */ }
+    }
+    apiRootChecked = true;
+    return cafeApiRoot;
+  }
   const cafeSourceFallback = 'https://ccconan.github.io/cafe-chico-website';
   let activeSourceRoot = cafeSourceRoot;
   const ocrLibraryUrl = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
@@ -30,6 +44,7 @@
   let lastReadText = '';
   let itemSignatures = null;
   let itemCandidates = [];
+  let itemRecords = [];
   let videoEl = null;
 
   const icon = (name) => {
@@ -115,7 +130,7 @@
   function captureReady() {
     const prompt = toolMode === 'menu'
       ? (ocrNote || '對準餐牌上的菜名，然後按「拍攝」')
-      : (ocrNote || '把物品放在取景框中央，然後按「拍攝」');
+      : (ocrNote || '把物品放在取景框中央，然後按「拍攝」— 比對場景物品庫');
     const privacy = toolMode === 'menu'
       ? '文字辨識在裝置內進行，不會上載相機影格。'
       : '視覺比對在裝置內進行，不會上載相機影格。';
@@ -128,7 +143,7 @@
   }
 
   function itemNoMatch() {
-    return `<div class="camera-action-tray"><p><strong>沒有外型相近的物品</strong></p><p class="camera-wait">取景框內沒有對應到資料庫中的試點物品。把物品放在框中央、光線充足再試。</p><div class="camera-shutter-row">${button('重拍', 'capture', 'button--secondary')}</div></div>`;
+    return `<div class="camera-action-tray"><p><strong>沒有外型相近的物品</strong></p><p class="camera-wait">這個場景的物品庫沒有對應的資料。把物品放在框中央、光線充足再試；或確認該場景已上載物品資料。</p><div class="camera-shutter-row">${button('重拍', 'capture', 'button--secondary')}</div></div>`;
   }
 
   function itemCandidatesView() {
@@ -172,7 +187,7 @@
   }
 
   function scanner() {
-    if (detail && dish) return dishDetail();
+    if (detail && dish) return dish.item ? itemDetail() : dishDetail();
     const modeSwitch = cameraMode === 'ready' && !detected && scanState !== 'reading'
       ? `<div class="mode-switch" role="group" aria-label="Tool mode"><button type="button" data-mode="menu" class="${toolMode === 'menu' ? 'is-active' : ''}">餐牌</button><button type="button" data-mode="item" class="${toolMode === 'item' ? 'is-active' : ''}">物品</button></div>` : '';
     return `<main class="camera-page"><div class="camera-page__chrome"><button class="icon-button" data-go="/" aria-label="Close scan">${icon('close')}</button><span>Cafe Chico</span>${mark(true)}</div><section class="camera-viewport ${cameraStream ? 'camera-viewport--live' : ''}" aria-label="Menu camera viewport">${cameraBackdrop()}${modeSwitch}<div class="camera-vignette" aria-hidden="true"></div>${scannerContent()}</section><div class="camera-page__bottom"><p>${scannerStatus()}</p>${sourceStatus === 'ready' && !detected ? `<span>手動拍攝 · ${pilotRecords.length} 道試點餐點</span>` : ''}</div></main>`;
@@ -180,6 +195,12 @@
 
   function dishDetail() {
     return `<main class="page page--detail">${header(`<button class="icon-button icon-button--surface" data-action="back" aria-label="Back to scan">${icon('back')}</button>`)}<article class="detail-card matte-card">${image(dish, 'detail-image')}<span class="field-label">Cafe Chico · ${escape(dish.category)}</span><h1>${escape(dish.name)}</h1><section><span class="field-label">Menu price</span><strong class="detail-price">${escape(dish.price)}</strong></section><section><span class="field-label">Menu description</span><p>${escape(dish.description)}</p></section><p class="muted">This source does not provide structured ingredients or allergen information. Treat the menu description as reference only.</p></article></main>`;
+  }
+
+  function itemDetail() {
+    const priceSection = dish.price && dish.price !== '未提供'
+      ? `<section><span class="field-label">Price</span><strong class="detail-price">${escape(dish.price)}</strong></section>` : '';
+    return `<main class="page page--detail">${header(`<button class="icon-button icon-button--surface" data-action="back" aria-label="Back to scan">${icon('back')}</button>`)}<article class="detail-card matte-card">${image(dish, 'detail-image')}<span class="field-label">場景物品 · ${escape(dish.category)}</span><h1>${escape(dish.name)}</h1>${priceSection}<section><span class="field-label">Description</span><p>${escape(dish.description)}</p></section><p class="muted">Item data comes from the venue\u2019s item database. Visual matching is a prototype and does not replace official identification.</p></article></main>`;
   }
 
   function manager() {
@@ -430,11 +451,36 @@
     });
   }
 
+  async function loadItems() {
+    try {
+      const response = await fetch(`${await ensureApiRoot()}/api/venues/cafe-chico/items`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Items API returned ${response.status}`);
+      const payload = await response.json();
+      const root = await ensureApiRoot();
+      itemRecords = (payload.items || []).map((item) => ({
+        id: item.id,
+        slug: item.slug,
+        name: item.name,
+        price: formatPrice(item.price),
+        description: item.desc || '未提供',
+        imageUrl: item.image ? `${root}/${item.image}` : '',
+        available: item.available !== false,
+        category: '場景物品',
+        item: true,
+      }));
+    } catch (error) {
+      console.warn('Items API unavailable, falling back to menu dishes as items:', error);
+      itemRecords = pilotRecords.map((record) => ({ ...record, category: '場景物品', item: true }));
+    }
+    itemSignatures = null;
+  }
+
   async function buildItemSignatures() {
+    if (!itemRecords.length) await loadItems();
     if (itemSignatures) return itemSignatures;
     const canvas = document.createElement('canvas');
     const out = [];
-    for (const record of pilotRecords) {
+    for (const record of itemRecords) {
       try {
         const img = await loadSignatureImage(record.imageUrl);
         canvas.width = img.naturalWidth || 320;
@@ -554,7 +600,7 @@
     if (name === 'detail') { detail = true; stopCamera(); render(); }
     if (name === 'back') { detail = false; cameraMode = 'idle'; render(); }
     if (name === 'pick-item') {
-      const found = pilotRecords.find((record) => record.slug === slug);
+      const found = itemRecords.find((record) => record.slug === slug);
       if (found) {
         dish = found;
         detail = true;
@@ -596,7 +642,7 @@
     }
     // 2) menu-api（Cloudflare D1 + R2 資料庫）
     try {
-      const response = await fetch(`${cafeApiRoot}/api/venues/cafe-chico/menu`, { cache: 'no-store' });
+      const response = await fetch(`${await ensureApiRoot()}/api/venues/cafe-chico/menu`, { cache: 'no-store' });
       if (!response.ok) throw new Error(`Menu API returned ${response.status}`);
       const payload = await response.json();
       const records = (payload.records || []).map((item) => ({

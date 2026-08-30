@@ -4,7 +4,21 @@
  * 正式版將以唯一 SN Account（Venue Owner / Editor / Visitor 三角色）取代。
  */
 (() => {
-  const API = 'https://menu-api.conanchan0217.workers.dev';
+  const API_DOMAINS = ['https://poplist.studionestir.com', 'https://menu-api.conanchan0217.workers.dev'];
+  let API = API_DOMAINS[API_DOMAINS.length - 1];
+  let apiResolved = false;
+  // 自訂網域（poplist.studionestir.com）生效後自動優先使用；否則退回 workers.dev
+  async function resolveApi() {
+    if (apiResolved) return API;
+    for (const domain of API_DOMAINS) {
+      try {
+        const response = await fetch(`${domain}/api/health`, { cache: 'no-store' });
+        if (response.ok) { API = domain; break; }
+      } catch (error) { /* try next domain */ }
+    }
+    apiResolved = true;
+    return API;
+  }
   const VENUE = 'cafe-chico';
   const KEY_STORE = 'nestir-merchant-key';
 
@@ -23,7 +37,7 @@
     const headers = { ...(options.headers || {}) };
     if (key) headers['x-admin-key'] = key;
     if (options.body && typeof options.body !== 'string') headers['content-type'] = 'application/json';
-    const response = await fetch(`${API}${path}`, { ...options, headers });
+    const response = await fetch(`${await resolveApi()}${path}`, { ...options, headers });
     return response;
   };
 
@@ -66,7 +80,7 @@
   }
 
   async function loadMenu() {
-    const response = await fetch(`${API}/api/venues/${VENUE}/menu`, { cache: 'no-store' });
+    const response = await fetch(`${await resolveApi()}/api/venues/${VENUE}/menu`, { cache: 'no-store' });
     if (!response.ok) {
       dishTable.innerHTML = '<p class="merchant-error">無法讀取餐點資料。</p>';
       return;
