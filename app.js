@@ -1,7 +1,7 @@
 (() => {
   const root = document.querySelector('#root');
   const cafeSourceRoot = '/cafe-chico-source';
-  const cafeApiDomains = ['https://poplist.studionestir.com', 'https://menu-api.conanchan0217.workers.dev'];
+  const cafeApiDomains = ['https://poplist.studionestir.com'];
   let cafeApiRoot = cafeApiDomains[cafeApiDomains.length - 1];
   let apiRootChecked = false;
   // 自訂網域（poplist.studionestir.com）生效後自動優先使用；否則退回 workers.dev

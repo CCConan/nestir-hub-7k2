@@ -4,7 +4,7 @@
  * 正式版將以唯一 SN Account（Venue Owner / Editor / Visitor 三角色）取代。
  */
 (() => {
-  const API_DOMAINS = ['https://poplist.studionestir.com', 'https://menu-api.conanchan0217.workers.dev'];
+  const API_DOMAINS = ['https://poplist.studionestir.com'];
   let API = API_DOMAINS[API_DOMAINS.length - 1];
   let apiResolved = false;
   // 自訂網域（poplist.studionestir.com）生效後自動優先使用；否則退回 workers.dev
