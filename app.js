@@ -453,7 +453,7 @@
 
   async function loadItems() {
     try {
-      const response = await fetch(`${await ensureApiRoot()}/api/venues/cafe-chico/items`, { cache: 'no-store' });
+      const response = await fetch(`${await ensureApiRoot()}/api/stations/cafe-chico/items`, { cache: 'no-store' });
       if (!response.ok) throw new Error(`Items API returned ${response.status}`);
       const payload = await response.json();
       const root = await ensureApiRoot();
@@ -642,7 +642,7 @@
     }
     // 2) menu-api（Cloudflare D1 + R2 資料庫）
     try {
-      const response = await fetch(`${await ensureApiRoot()}/api/venues/cafe-chico/menu`, { cache: 'no-store' });
+      const response = await fetch(`${await ensureApiRoot()}/api/stations/cafe-chico/menu`, { cache: 'no-store' });
       if (!response.ok) throw new Error(`Menu API returned ${response.status}`);
       const payload = await response.json();
       const records = (payload.records || []).map((item) => ({

@@ -1,8 +1,8 @@
 /*
  * NESTIR 店家後台（原型）— 雙模式：
- * 1. 店家模式（merchant.html?venue=slug&token=…）：QR 掃描進入，編輯自己店的餐點／圖片（X-Merchant-Token）。
+ * 1. 店家模式（merchant.html?station=slug&token=…）：QR 掃描進入，編輯自己店的餐點／圖片（X-Merchant-Token）。
  * 2. 營運模式（無參數）：輸入營運金鑰 → 開店（店家同意）→ 產生店家 token + QR。
- * 正式版將以唯一 SN Account 取代 token 機制。
+ * 正式版將以唯一 NESTIR Account 取代 token 機制。
  */
 (() => {
   const API_DOMAINS = ['https://poplist.studionestir.com'];
@@ -22,9 +22,9 @@
   }
 
   const params = new URLSearchParams(location.search);
-  const venueSlug = params.get('venue');
+  const stationSlug = params.get('station');
   const merchantToken = params.get('token');
-  const isMerchant = Boolean(venueSlug && merchantToken);
+  const isMerchant = Boolean(stationSlug && merchantToken);
 
   const operatorGate = document.querySelector('#operatorGate');
   const operatorDash = document.querySelector('#operatorDash');
@@ -68,12 +68,12 @@
       return;
     }
     const meData = await me.json();
-    const venue = meData.venue;
-    modeBadge.textContent = `${venue.name} · 店家後台`;
-    document.querySelector('#venueTitle').textContent = venue.name;
-    document.querySelector('#venueMeta').textContent = `網址 slug：${venue.slug} · 資料來源 ${venue.menu_version || '—'}`;
+    const station = meData.station;
+    modeBadge.textContent = `${station.name} · 店家後台`;
+    document.querySelector('#venueTitle').textContent = station.name;
+    document.querySelector('#venueMeta').textContent = `網址 slug：${station.slug} · 資料來源 ${station.menu_version || '—'}`;
 
-    const res = await fetch(`${await resolveApi()}/api/venues/${venue.slug}/menu`, { cache: 'no-store' });
+    const res = await fetch(`${await resolveApi()}/api/stations/${station.slug}/menu`, { cache: 'no-store' });
     if (!res.ok) return;
     const payload = await res.json();
     records = payload.records || [];
@@ -81,7 +81,7 @@
     document.querySelector('#statImage').textContent = records.filter((r) => r.image).length;
     document.querySelector('#statNoImage').textContent = records.filter((r) => !r.image).length;
     document.querySelector('#statAvailable').textContent = records.filter((r) => r.available).length;
-    renderRows(venue.slug, 'merchant');
+    renderRows(station.slug, 'merchant');
   }
 
   function renderRows(slug, scope) {
@@ -189,22 +189,22 @@
   }
 
   async function loadVenueList() {
-    const res = await fetch(`${await resolveApi()}/api/venues`);
+    const res = await fetch(`${await resolveApi()}/api/stations`);
     if (!res.ok) return;
-    const { venues } = await res.json();
-    document.querySelector('#venueList').innerHTML = (venues || []).map((v) =>
+    const { stations } = await res.json();
+    document.querySelector('#venueList').innerHTML = (stations || []).map((v) =>
       `<div class="merchant-stat"><strong>${esc(v.name)}</strong><span>${esc(v.slug)} · 餐點 ${v.dishes_count} · 物品 ${v.items_count}</span></div>`
     ).join('');
   }
 
   async function onboard() {
     const venueName = document.querySelector('#venueName').value.trim();
-    const venueSlug = document.querySelector('#venueSlug').value.trim();
+    const stationSlugInput = document.querySelector('#venueSlug').value.trim();
     const consent = document.querySelector('#consent').checked;
     if (!venueName) { showToast('請輸入店名'); return; }
     if (!consent) { showToast('請確認店家已同意'); return; }
-    const body = { venue_name: venueName };
-    if (venueSlug) body.venue_slug = venueSlug;
+    const body = { station_name: venueName };
+    if (stationSlugInput) body.station_slug = stationSlugInput;
     const res = await opApi('/api/admin/onboard', { method: 'POST', body: JSON.stringify(body) });
     const data = await res.json();
     if (!res.ok) { showToast(`開店失敗：${data.error || res.status}`); return; }
