@@ -90,7 +90,7 @@
       id: item.id,
       slug: item.slug,
       name: item.name,
-      category: item.cat_name,
+      category: item.cat_name || item.category || '',
       description: item.desc || '未提供',
       price: formatPrice(item.price),
       imageUrl: item.image ? sourceImageUrl(item.image) : '',
@@ -451,32 +451,7 @@
     });
   }
 
-  async function loadItems() {
-    try {
-      const response = await fetch(`${await ensureApiRoot()}/api/stations/cafe-chico/items`, { cache: 'no-store' });
-      if (!response.ok) throw new Error(`Items API returned ${response.status}`);
-      const payload = await response.json();
-      const root = await ensureApiRoot();
-      itemRecords = (payload.items || []).map((item) => ({
-        id: item.id,
-        slug: item.slug,
-        name: item.name,
-        price: formatPrice(item.price),
-        description: item.desc || '未提供',
-        imageUrl: item.image ? `${root}/${item.image}` : '',
-        available: item.available !== false,
-        category: '場景物品',
-        item: true,
-      }));
-    } catch (error) {
-      console.warn('Items API unavailable, falling back to menu dishes as items:', error);
-      itemRecords = pilotRecords.map((record) => ({ ...record, category: '場景物品', item: true }));
-    }
-    itemSignatures = null;
-  }
-
   async function buildItemSignatures() {
-    if (!itemRecords.length) await loadItems();
     if (itemSignatures) return itemSignatures;
     const canvas = document.createElement('canvas');
     const out = [];
@@ -620,6 +595,8 @@
   }
 
   function acceptRecords(records) {
+    itemRecords = records.map((record) => ({ ...directRecord(record), item: true }));
+    itemSignatures = null;
     const selected = selectPilotRecords(records);
     if (selected.length < 10) throw new Error('Fewer than ten usable source records were found');
     pilotRecords = selected;
@@ -642,15 +619,14 @@
     }
     // 2) menu-api（Cloudflare D1 + R2 資料庫）
     try {
-      const response = await fetch(`${await ensureApiRoot()}/api/stations/cafe-chico/menu`, { cache: 'no-store' });
-      if (!response.ok) throw new Error(`Menu API returned ${response.status}`);
+      const response = await fetch(`${await ensureApiRoot()}/api/stations/cafe-chico/items`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Items API returned ${response.status}`);
       const payload = await response.json();
-      const records = (payload.records || []).map((item) => ({
+      const records = (payload.items || []).map((item) => ({
         id: item.id,
         slug: item.slug,
         name: item.name,
-        cat_name: item.cat_name,
-        cat_slug: item.cat_slug,
+        cat_name: item.category,
         desc: item.desc,
         price: item.price,
         image: item.image,

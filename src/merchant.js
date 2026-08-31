@@ -73,10 +73,10 @@
     document.querySelector('#venueTitle').textContent = station.name;
     document.querySelector('#venueMeta').textContent = `網址 slug：${station.slug} · 資料來源 ${station.menu_version || '—'}`;
 
-    const res = await fetch(`${await resolveApi()}/api/stations/${station.slug}/menu`, { cache: 'no-store' });
+    const res = await fetch(`${await resolveApi()}/api/stations/${station.slug}/items`, { cache: 'no-store' });
     if (!res.ok) return;
     const payload = await res.json();
-    records = payload.records || [];
+    records = payload.items || [];
     document.querySelector('#statTotal').textContent = records.length;
     document.querySelector('#statImage').textContent = records.filter((r) => r.image).length;
     document.querySelector('#statNoImage').textContent = records.filter((r) => !r.image).length;
@@ -90,7 +90,7 @@
       const hasImage = Boolean(record.image);
       return `
         <div class="merchant-row" data-slug="${esc(record.slug)}">
-          <div class="merchant-row__name">${esc(record.name)}<small>${esc(record.cat_name || '')} · ${esc(record.slug)}</small></div>
+          <div class="merchant-row__name">${esc(record.name)}<small>${esc(record.category || '')} · ${esc(record.slug)}</small></div>
           <div class="merchant-row__field"><label class="merchant-row__label">價格 £</label><input type="number" step="0.05" min="0" data-field="price" value="${esc(record.price ?? '')}"/></div>
           <div class="merchant-row__field"><label class="merchant-row__label">可見描述</label><input type="text" data-field="description" value="${esc(record.desc || '')}"/></div>
           <div class="merchant-row__status">
@@ -118,14 +118,14 @@
         if (!record) return;
         const body = {
           name: record.name,
-          cat_name: record.cat_name,
+          category: record.category,
           price: row.querySelector('[data-field="price"]').value === '' ? null : Number(row.querySelector('[data-field="price"]').value),
           description: row.querySelector('[data-field="description"]').value,
           available: row.querySelector('[data-field="available"]').checked,
         };
         feedback.textContent = '儲存中…';
         try {
-          const response = await merchantApi(`/api/merchant/dishes/${rowSlug}`, { method: 'PUT', body: JSON.stringify(body) });
+          const response = await merchantApi(`/api/merchant/items/${rowSlug}`, { method: 'PUT', body: JSON.stringify(body) });
           if (!response.ok) throw new Error(await response.text());
           Object.assign(record, body);
           feedback.textContent = '✓ 已儲存';
@@ -147,9 +147,8 @@
             method: 'PUT', body: file, headers: { 'content-type': file.type || 'image/jpeg' },
           });
           if (!imageResponse.ok) throw new Error(await imageResponse.text());
-          await merchantApi(`/api/merchant/dishes/${rowSlug}`, { method: 'PUT', body: JSON.stringify({ image_key: imageKey }) });
           const rec = records.find((r) => r.slug === rowSlug);
-          await merchantApi(`/api/merchant/items/${rowSlug}`, { method: 'PUT', body: JSON.stringify({ name: rec.name, price: rec.price, description: rec.description, image_key: imageKey }) });
+          await merchantApi(`/api/merchant/items/${rowSlug}`, { method: 'PUT', body: JSON.stringify({ name: rec.name, category: rec.category, price: rec.price, description: rec.description, image_key: imageKey }) });
           if (rec) rec.image = `api/images/${imageKey}`;
           feedback.textContent = '✓ 圖片已更新';
           showToast(`${rec?.name || rowSlug} 圖片已更新（含物品庫）`);
