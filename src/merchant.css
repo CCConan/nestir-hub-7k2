@@ -56,6 +56,38 @@
 
 .merchant-error { color: #E08A8A !important; font-weight: 650; }
 
+/* 開店表單與 QR */
+.merchant-onboard {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(233, 234, 231, .12);
+  background: rgba(233, 234, 231, .05);
+  margin-bottom: 20px;
+}
+.merchant-onboard h2 { margin: 0 0 14px; font-size: 20px; }
+.merchant-onboard__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.merchant-onboard__row label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #B9C6CE; }
+.merchant-onboard__row input {
+  min-height: 44px;
+  border: 1px solid rgba(233, 234, 231, .22);
+  border-radius: 12px;
+  padding: 0 12px;
+  background: rgba(233, 234, 231, .07);
+  color: var(--portal-paper);
+  font-size: 14px;
+  outline: none;
+}
+.merchant-onboard__row input:focus { border-color: var(--portal-blue); }
+.merchant-onboard__actions { margin-top: 14px; display: flex; gap: 10px; }
+.merchant-onboard__url {
+  font-size: 13px;
+  color: #7FBF9F;
+  word-break: break-all;
+  margin: 6px 0 14px;
+}
+.merchant-qr { display: inline-block; padding: 10px; background: #fff; border-radius: 12px; }
+.merchant-qr svg { display: block; }
+
 .merchant-dash { margin-top: 30px; }
 
 .merchant-dash__head {

@@ -1,51 +1,44 @@
 /*
- * NESTIR 商戶介面（原型）— Cafe Chico 餐點資料管理。
- * 讀取/更新透過 menu-api（Cloudflare D1 + R2）；原型權限為 X-Admin-Key，
- * 正式版將以唯一 SN Account（Venue Owner / Editor / Visitor 三角色）取代。
+ * NESTIR 店家後台（原型）— 雙模式：
+ * 1. 店家模式（merchant.html?venue=slug&token=…）：QR 掃描進入，編輯自己店的餐點／圖片（X-Merchant-Token）。
+ * 2. 營運模式（無參數）：輸入營運金鑰 → 開店（店家同意）→ 產生店家 token + QR。
+ * 正式版將以唯一 SN Account 取代 token 機制。
  */
 (() => {
   const API_DOMAINS = ['https://poplist.studionestir.com'];
   let API = API_DOMAINS[API_DOMAINS.length - 1];
   let apiResolved = false;
-  // 自訂網域（poplist.studionestir.com）生效後自動優先使用；否則退回 workers.dev
+
   async function resolveApi() {
     if (apiResolved) return API;
     for (const domain of API_DOMAINS) {
       try {
         const response = await fetch(`${domain}/api/health`, { cache: 'no-store' });
         if (response.ok) { API = domain; break; }
-      } catch (error) { /* try next domain */ }
+      } catch (error) { /* next */ }
     }
     apiResolved = true;
     return API;
   }
-  const VENUE = 'cafe-chico';
-  const KEY_STORE = 'nestir-merchant-key';
 
-  const authGate = document.querySelector('#authGate');
-  const dashboard = document.querySelector('#dashboard');
-  const keyInput = document.querySelector('#adminKey');
-  const unlockBtn = document.querySelector('#unlockBtn');
-  const authError = document.querySelector('#authError');
-  const dishTable = document.querySelector('#dishTable');
-  const refreshBtn = document.querySelector('#refreshBtn');
+  const params = new URLSearchParams(location.search);
+  const venueSlug = params.get('venue');
+  const merchantToken = params.get('token');
+  const isMerchant = Boolean(venueSlug && merchantToken);
 
+  const operatorGate = document.querySelector('#operatorGate');
+  const operatorDash = document.querySelector('#operatorDash');
+  const merchantDash = document.querySelector('#merchantDash');
+  const modeBadge = document.querySelector('#modeBadge');
+
+  let key = localStorage.getItem('nestir-merchant-key') || '';
   let records = [];
-  let key = localStorage.getItem(KEY_STORE) || '';
-
-  const api = async (path, options = {}) => {
-    const headers = { ...(options.headers || {}) };
-    if (key) headers['x-admin-key'] = key;
-    if (options.body && typeof options.body !== 'string') headers['content-type'] = 'application/json';
-    const response = await fetch(`${await resolveApi()}${path}`, { ...options, headers });
-    return response;
-  };
 
   function esc(value) {
     return String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
   }
 
-  function showSaved(message) {
+  function showToast(message) {
     let toast = document.querySelector('.merchant-saved');
     if (!toast) {
       toast = document.createElement('div');
@@ -54,50 +47,46 @@
     }
     toast.textContent = message;
     toast.classList.add('show');
-    clearTimeout(showSaved._t);
-    showSaved._t = setTimeout(() => toast.classList.remove('show'), 1800);
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 2200);
   }
 
-  async function verifyKey() {
-    const response = await api('/api/admin/verify');
-    return response.ok;
+  // ---- 店家模式 ----
+  async function merchantApi(path, options = {}) {
+    const headers = { ...(options.headers || {}) };
+    headers['x-merchant-token'] = merchantToken;
+    if (options.body && typeof options.body !== 'string') headers['content-type'] = 'application/json';
+    const base = await resolveApi();
+    return fetch(`${base}${path}`, { ...options, headers });
   }
 
-  async function unlock() {
-    key = keyInput.value.trim();
-    authError.hidden = true;
-    if (!key) return;
-    const ok = await verifyKey();
-    if (!ok) {
-      authError.textContent = '金鑰無效，請檢查後再試。';
-      authError.hidden = false;
+  async function loadMerchant() {
+    const me = await merchantApi('/api/merchant/me');
+    if (!me.ok) {
+      document.querySelector('#venueTitle').textContent = '登入失效';
+      document.querySelector('#venueMeta').textContent = 'QR 連結無效或已過期。';
       return;
     }
-    localStorage.setItem(KEY_STORE, key);
-    authGate.hidden = true;
-    dashboard.hidden = false;
-    await loadMenu();
-  }
+    const meData = await me.json();
+    const venue = meData.venue;
+    modeBadge.textContent = `${venue.name} · 店家後台`;
+    document.querySelector('#venueTitle').textContent = venue.name;
+    document.querySelector('#venueMeta').textContent = `網址 slug：${venue.slug} · 資料來源 ${venue.menu_version || '—'}`;
 
-  async function loadMenu() {
-    const response = await fetch(`${await resolveApi()}/api/venues/${VENUE}/menu`, { cache: 'no-store' });
-    if (!response.ok) {
-      dishTable.innerHTML = '<p class="merchant-error">無法讀取餐點資料。</p>';
-      return;
-    }
-    const payload = await response.json();
+    const res = await fetch(`${await resolveApi()}/api/venues/${venue.slug}/menu`, { cache: 'no-store' });
+    if (!res.ok) return;
+    const payload = await res.json();
     records = payload.records || [];
-    document.querySelector('#venueMeta').textContent =
-      `${payload.venue?.name || 'Cafe Chico'} · 資料來源 ${payload.venue?.menu_version || '—'} · 更新 ${payload.venue ? '見各列' : '—'}`;
     document.querySelector('#statTotal').textContent = records.length;
     document.querySelector('#statImage').textContent = records.filter((r) => r.image).length;
     document.querySelector('#statNoImage').textContent = records.filter((r) => !r.image).length;
     document.querySelector('#statAvailable').textContent = records.filter((r) => r.available).length;
-    renderRows();
+    renderRows(venue.slug, 'merchant');
   }
 
-  function renderRows() {
-    dishTable.innerHTML = records.map((record) => {
+  function renderRows(slug, scope) {
+    const table = document.querySelector('#dishTable');
+    table.innerHTML = records.map((record) => {
       const hasImage = Boolean(record.image);
       return `
         <div class="merchant-row" data-slug="${esc(record.slug)}">
@@ -117,15 +106,15 @@
         </div>`;
     }).join('');
 
-    dishTable.querySelectorAll('.merchant-row').forEach((row) => {
-      const slug = row.dataset.slug;
+    table.querySelectorAll('.merchant-row').forEach((row) => {
+      const rowSlug = row.dataset.slug;
       const saveBtn = row.querySelector('.merchant-btn--save');
       const uploadBtn = row.querySelector('.merchant-row__upload');
       const fileInput = row.querySelector('.merchant-row__file');
       const feedback = row.querySelector('.merchant-row__feedback');
 
       saveBtn.addEventListener('click', async () => {
-        const record = records.find((r) => r.slug === slug);
+        const record = records.find((r) => r.slug === rowSlug);
         if (!record) return;
         const body = {
           name: record.name,
@@ -136,11 +125,11 @@
         };
         feedback.textContent = '儲存中…';
         try {
-          const response = await api(`/api/admin/venues/${VENUE}/dishes/${slug}`, { method: 'PUT', body: JSON.stringify(body) });
+          const response = await merchantApi(`/api/merchant/dishes/${rowSlug}`, { method: 'PUT', body: JSON.stringify(body) });
           if (!response.ok) throw new Error(await response.text());
           Object.assign(record, body);
           feedback.textContent = '✓ 已儲存';
-          showSaved(`${record.name} 已更新`);
+          showToast(`${record.name} 已更新`);
         } catch (error) {
           console.error(error);
           feedback.textContent = '✗ 儲存失敗';
@@ -151,25 +140,20 @@
       fileInput.addEventListener('change', async () => {
         const file = fileInput.files && fileInput.files[0];
         if (!file) return;
-        const imageKey = `${VENUE}/${slug}.jpg`;
+        const imageKey = `${slug}/${rowSlug}.jpg`;
         feedback.textContent = '上載中…';
         try {
-          const imageResponse = await api(`/api/admin/images/${imageKey}`, {
-            method: 'PUT',
-            body: file,
-            headers: { 'content-type': file.type || 'image/jpeg' },
+          const imageResponse = await merchantApi(`/api/merchant/images/${imageKey}`, {
+            method: 'PUT', body: file, headers: { 'content-type': file.type || 'image/jpeg' },
           });
           if (!imageResponse.ok) throw new Error(await imageResponse.text());
-          const dishResponse = await api(`/api/admin/venues/${VENUE}/dishes/${slug}`, {
-            method: 'PUT',
-            body: JSON.stringify({ image_key: imageKey }),
-          });
-          if (!dishResponse.ok) throw new Error(await dishResponse.text());
-          const record = records.find((r) => r.slug === slug);
-          if (record) record.image = `api/images/${imageKey}`;
+          await merchantApi(`/api/merchant/dishes/${rowSlug}`, { method: 'PUT', body: JSON.stringify({ image_key: imageKey }) });
+          const rec = records.find((r) => r.slug === rowSlug);
+          await merchantApi(`/api/merchant/items/${rowSlug}`, { method: 'PUT', body: JSON.stringify({ name: rec.name, price: rec.price, description: rec.description, image_key: imageKey }) });
+          if (rec) rec.image = `api/images/${imageKey}`;
           feedback.textContent = '✓ 圖片已更新';
-          showSaved(`${record?.name || slug} 圖片已更新`);
-          renderRows();
+          showToast(`${rec?.name || rowSlug} 圖片已更新（含物品庫）`);
+          renderRows(slug, scope);
         } catch (error) {
           console.error(error);
           feedback.textContent = '✗ 上載失敗';
@@ -178,24 +162,91 @@
     });
   }
 
-  unlockBtn.addEventListener('click', unlock);
-  keyInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') unlock();
-  });
-  refreshBtn.addEventListener('click', loadMenu);
-
-  // 已儲存金鑰時直接嘗試解鎖
-  if (key) {
-    (async () => {
-      const ok = await verifyKey();
-      if (ok) {
-        keyInput.value = key;
-        authGate.hidden = true;
-        dashboard.hidden = false;
-        await loadMenu();
-      } else {
-        localStorage.removeItem(KEY_STORE);
-      }
-    })();
+  // ---- 營運模式 ----
+  async function opApi(path, options = {}) {
+    const headers = { ...(options.headers || {}) };
+    if (key) headers['x-admin-key'] = key;
+    if (options.body && typeof options.body !== 'string') headers['content-type'] = 'application/json';
+    const base = await resolveApi();
+    return fetch(`${base}${path}`, { ...options, headers });
   }
+
+  async function unlock() {
+    key = document.querySelector('#adminKey').value.trim();
+    const err = document.querySelector('#authError');
+    err.hidden = true;
+    if (!key) return;
+    const ok = await opApi('/api/admin/verify');
+    if (!ok.ok) {
+      err.textContent = '金鑰無效，請檢查後再試。';
+      err.hidden = false;
+      return;
+    }
+    localStorage.setItem('nestir-merchant-key', key);
+    operatorGate.hidden = true;
+    operatorDash.hidden = false;
+    await loadVenueList();
+  }
+
+  async function loadVenueList() {
+    const res = await fetch(`${await resolveApi()}/api/venues`);
+    if (!res.ok) return;
+    const { venues } = await res.json();
+    document.querySelector('#venueList').innerHTML = (venues || []).map((v) =>
+      `<div class="merchant-stat"><strong>${esc(v.name)}</strong><span>${esc(v.slug)} · 餐點 ${v.dishes_count} · 物品 ${v.items_count}</span></div>`
+    ).join('');
+  }
+
+  async function onboard() {
+    const venueName = document.querySelector('#venueName').value.trim();
+    const venueSlug = document.querySelector('#venueSlug').value.trim();
+    const consent = document.querySelector('#consent').checked;
+    if (!venueName) { showToast('請輸入店名'); return; }
+    if (!consent) { showToast('請確認店家已同意'); return; }
+    const body = { venue_name: venueName };
+    if (venueSlug) body.venue_slug = venueSlug;
+    const res = await opApi('/api/admin/onboard', { method: 'POST', body: JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) { showToast(`開店失敗：${data.error || res.status}`); return; }
+
+    document.querySelector('#onboardResult').hidden = false;
+    document.querySelector('#merchantUrl').textContent = data.merchant_url;
+    const qrBox = document.querySelector('#qr');
+    qrBox.innerHTML = '';
+    if (window.qrcode) {
+      const qr = window.qrcode(0, 'M');
+      qr.addData(data.merchant_url);
+      qr.make();
+      qrBox.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2 });
+    } else {
+      qrBox.textContent = '（QR 函式庫未載入，請直接使用上方網址）';
+    }
+    document.querySelector('#copyUrl').onclick = () => {
+      navigator.clipboard?.writeText(data.merchant_url);
+      showToast('網址已複製');
+    };
+    showToast('店家帳號已建立');
+    await loadVenueList();
+  }
+
+  // ---- 啟動 ----
+  function start() {
+    if (isMerchant) {
+      merchantDash.hidden = false;
+      loadMerchant();
+    } else {
+      operatorGate.hidden = false;
+      document.querySelector('#unlockBtn').addEventListener('click', unlock);
+      document.querySelector('#adminKey').addEventListener('keydown', (e) => { if (e.key === 'Enter') unlock(); });
+      document.querySelector('#onboardBtn').addEventListener('click', onboard);
+      if (key) {
+        document.querySelector('#adminKey').value = key;
+        unlock();
+      }
+    }
+    const refreshBtn = document.querySelector('#refreshBtn');
+    if (refreshBtn) refreshBtn.addEventListener('click', () => isMerchant ? loadMerchant() : loadVenueList());
+  }
+
+  start();
 })();
