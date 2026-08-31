@@ -20,7 +20,7 @@ export const TOOLS = [
     id: 'poplist',
     name: 'PopList SN',
     zh: '現場視覺查詢',
-    url: 'index.html',
+    url: 'https://poplist.studionestir.com/',
     active: true,
     color: '#347A5B', // brand green
     pos: [1.5, 0.35, 1.5],

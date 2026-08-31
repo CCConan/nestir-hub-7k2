@@ -1,6 +1,0 @@
-@media (max-width: 700px) {
-  body, .page { width: 100%; overflow-x: hidden; }
-  .topbar { gap: 12px; }
-  .landing-copy { width: 100%; min-width: 0; }
-  .landing-copy p { width: 100%; max-width: 100%; overflow-wrap: anywhere; }
-}

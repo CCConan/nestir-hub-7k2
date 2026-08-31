@@ -1,18 +1,62 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#E9EAE7" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>NESTIR · PopList test</title>
+    <meta name="theme-color" content="#0A1E31" />    <title>NESTIR · 世界入口</title>
+    <link rel="stylesheet" href="src/portal.css?v=20260829-2" />
   </head>
   <body>
-    <link rel="stylesheet" href="src/styles.css?v=20260829-3" />
-    <link rel="stylesheet" href="src/mobile.css?v=20260829-3" />
-    <link rel="stylesheet" href="src/sn-platform.css?v=20260829-3" />
-    <link rel="stylesheet" href="src/camera.css?v=20260829-4" />
-    <div id="root"></div>
-    <script src="app.js?v=20260829-17"></script>
+    <main class="portal">
+      <header class="portal-bar">
+        <a class="portal-brand" href="index.html">
+          <span class="portal-compass" aria-hidden="true"><i></i></span>
+          <span>NESTIR</span>
+        </a>
+      </header>
+
+      <section class="portal-hero">
+        <h1>NESTIR 世界入口</h1>
+        <p>由一個真實需要開始，認識工具、故事與可探索的世界。</p>
+        <a class="portal-enter" href="lobby.html">進入大廳 <span aria-hidden="true">→</span></a>
+      </section>
+
+      <section class="portal-roster">
+        <div class="portal-roster__item">
+          <span class="portal-roster__dot" style="--c:#347A5B"></span>
+          <span><strong>PopList SN</strong><em>現場視覺查詢</em></span>
+        </div>
+        <div class="portal-roster__item">
+          <span class="portal-roster__dot" style="--c:#CC7A00"></span>
+          <span><strong>MissionRelay SN</strong><em>中繼與互助</em></span>
+        </div>
+        <div class="portal-roster__item">
+          <span class="portal-roster__dot" style="--c:#C2571F"></span>
+          <span><strong>記憶地圖</strong><em>食物・回憶 3D 地球</em></span>
+        </div>
+        <div class="portal-roster__item">
+          <span class="portal-roster__dot" style="--c:#3E7C8C"></span>
+          <span><strong>BodyGravity SN</strong><em>身體準備</em></span>
+        </div>
+        <div class="portal-roster__item">
+          <span class="portal-roster__dot" style="--c:#6B7FA3"></span>
+          <span><strong>TripBoard SN</strong><em>遠行與行程</em></span>
+        </div>
+        <div class="portal-roster__item">
+          <span class="portal-roster__dot" style="--c:#8A6DA8"></span>
+          <span><strong>知識探索</strong><em>Knowledge Cards / TubeList</em></span>
+        </div>
+        <div class="portal-roster__item">
+          <span class="portal-roster__dot" style="--c:#A8836B"></span>
+          <span><strong>日常檔案</strong><em>Receipt / PhotoID</em></span>
+        </div>
+        <div class="portal-roster__item">
+          <span class="portal-roster__dot" style="--c:#C9A24B"></span>
+          <span><strong>NanaHub</strong><em>家與社群</em></span>
+        </div>
+      </section>
+
+      <p class="portal-note">工具各自獨立、可從網址直接進入；無需安裝 App 或建立帳號即可開始。</p>
+    </main>
   </body>
 </html>
