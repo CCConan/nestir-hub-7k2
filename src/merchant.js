@@ -6,6 +6,7 @@
  */
 (() => {
   const API_DOMAINS = ['https://poplist.studionestir.com'];
+  const STATIONS_API = 'https://stations.studionestir.com';
   let API = API_DOMAINS[API_DOMAINS.length - 1];
   let apiResolved = false;
 
@@ -188,7 +189,7 @@
   }
 
   async function loadVenueList() {
-    const res = await fetch(`${await resolveApi()}/api/stations`);
+    const res = await fetch(`${STATIONS_API}/api/stations`);
     if (!res.ok) return;
     const { stations } = await res.json();
     document.querySelector('#venueList').innerHTML = (stations || []).map((v) =>
