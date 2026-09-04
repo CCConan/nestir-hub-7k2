@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#E9EAE7" />
+    <title>單據夾 SN · Receipt Analysis</title>
+    <link rel="stylesheet" href="src/portal.css?v=20260901-2" />
+    <style>
+      .portal { max-width: 960px; }
+      .rc { margin-top: 18px; }
+      .rc-toolbar {
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        flex-wrap: wrap; margin-bottom: 16px;
+      }
+      .rc-back {
+        display: inline-flex; align-items: center; gap: 8px;
+        color: var(--portal-muted); text-decoration: none; font-size: 14px; font-weight: 650;
+        transition: color .2s ease;
+      }
+      .rc-back:hover { color: var(--portal-blue); }
+      .rc-h1 { margin: 0; font-size: 26px; letter-spacing: -.02em; }
+      .rc-sub { color: var(--portal-muted); font-size: 13px; margin: 4px 0 0; }
+
+      .rc-drop {
+        position: relative; display: grid; place-items: center; gap: 12px;
+        padding: 52px 24px; text-align: center; cursor: pointer;
+        border: 1.5px dashed rgba(20,46,71,.24); border-radius: 22px;
+        background: rgba(215,220,221,.4); transition: border-color .2s ease, background .2s ease;
+      }
+      .rc-drop.is-over { border-color: var(--portal-blue); background: rgba(73,101,118,.12); }
+      .rc-drop .rc-drop__icon { font-size: 34px; line-height: 1; opacity: .8; }
+      .rc-drop__strong { font-size: 16px; font-weight: 700; }
+      .rc-drop__hint { color: var(--portal-muted); font-size: 13px; }
+      .rc-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+      .rc-preview { display: none; margin-top: 14px; gap: 14px; align-items: center; }
+      .rc-preview img { max-width: 220px; max-height: 160px; border-radius: 12px; border: 1px solid rgba(20,46,71,.14); }
+      .rc-preview__meta { font-size: 13px; color: var(--portal-muted); line-height: 1.5; }
+      .rc-preview__file { color: var(--portal-ink); font-weight: 650; }
+
+      .rc-actions { display: none; margin-top: 16px; }
+      .rc-btn {
+        display: inline-flex; align-items: center; gap: 10px;
+        min-height: 52px; padding: 0 26px; border: 0; border-radius: 26px;
+        background: var(--portal-blue); color: #fff; font-weight: 700; font-size: 16px;
+        cursor: pointer; transition: background .2s ease, transform .08s ease;
+      }
+      .rc-btn:hover { background: #3A5465; }
+      .rc-btn:active { transform: scale(.97); }
+      .rc-btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+      .rc-progress { display: none; margin-top: 22px; }
+      .rc-progress__track { height: 6px; border-radius: 6px; background: rgba(20,46,71,.12); overflow: hidden; }
+      .rc-progress__bar { height: 100%; width: 0%; background: linear-gradient(90deg,#347A5B,#496576); transition: width .4s ease; }
+      .rc-progress__label { margin-top: 10px; color: var(--portal-muted); font-size: 13px; }
+
+      .rc-result { display: none; margin-top: 26px; }
+      .rc-card {
+        border: 1px solid rgba(20,46,71,.14); border-radius: 18px;
+        background: rgba(215,220,221,.5); padding: 20px; margin-top: 16px;
+      }
+      .rc-card__title { font-size: 13px; letter-spacing: .1em; color: var(--portal-muted); text-transform: uppercase; margin: 0 0 12px; }
+
+      .rc-badge { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+      .rc-badge--accepted { background: rgba(52,122,91,.14); color: #256346; }
+      .rc-badge--corrected { background: rgba(204,122,0,.16); color: #9A6224; }
+      .rc-badge--warning   { background: rgba(204,122,0,.16); color: #9A6224; }
+      .rc-badge--rejected  { background: rgba(162,60,60,.14); color: #A23C3C; }
+
+      .rc-receipt__head { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+      .rc-receipt__title { font-size: 18px; font-weight: 700; }
+      .rc-receipt__meta { color: var(--portal-muted); font-size: 13px; }
+      .rc-total { text-align: right; }
+      .rc-total__label { color: var(--portal-muted); font-size: 12px; }
+      .rc-total__value { font-size: 26px; font-weight: 750; letter-spacing: -.02em; }
+
+      table.rc-items { width: 100%; border-collapse: collapse; font-size: 14px; }
+      table.rc-items th, table.rc-items td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(20,46,71,.08); }
+      table.rc-items th { color: var(--portal-muted); font-weight: 600; font-size: 12px; }
+      table.rc-items th.num, table.rc-items td.num { text-align: right; }
+
+      .rc-rule { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(20,46,71,.08); font-size: 13.5px; }
+      .rc-rule:last-child { border-bottom: 0; }
+      .rc-rule__mark { font-weight: 700; width: 16px; }
+      .rc-rule__ok { color: #347A5B; }
+      .rc-rule__no { color: #A23C3C; }
+      .rc-rule__detail { color: var(--portal-muted); font-size: 12.5px; margin-top: 2px; }
+
+      .rc-keyvals { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; font-size: 13px; }
+      .rc-keyvals dt { color: var(--portal-muted); font-size: 11.5px; margin-bottom: 3px; }
+      .rc-keyvals dd { margin: 0; font-weight: 650; }
+      .rc-keyvals dd.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; font-weight: 500; word-break: break-all; }
+
+      pre.rc-raw { white-space: pre-wrap; word-break: break-word; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; line-height: 1.55; color: var(--portal-ink); margin: 0; }
+
+      .rc-error { display: none; margin-top: 22px; padding: 16px 18px; border-radius: 14px; background: rgba(162,60,60,.10); border: 1px solid rgba(162,60,60,.35); color: #A23C3C; font-size: 14px; }
+      .rc-attempt status { font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+
+      .rc-mode { display: flex; gap: 8px; margin-top: 14px; }
+      .rc-mode__btn {
+        flex: none; padding: 8px 18px; border-radius: 999px; border: 1px solid rgba(20,46,71,.16);
+        background: rgba(215,220,221,.4); color: var(--portal-muted); font-size: 13px; font-weight: 650; cursor: pointer;
+        transition: border-color .2s ease, background .2s ease, color .2s ease;
+      }
+      .rc-mode__btn.is-active { border-color: var(--portal-blue); background: rgba(73,101,118,.16); color: var(--portal-ink); }
+      .rc-text {
+        display: block; width: 100%; margin-top: 12px; padding: 12px 14px; resize: vertical;
+        min-height: 54px; border-radius: 14px; border: 1px solid rgba(20,46,71,.16);
+        background: #fff; color: var(--portal-ink); font-size: 14px; font-family: inherit; line-height: 1.55;
+      }
+      .rc-text::placeholder { color: var(--portal-muted); }
+      .rc-category { margin-top: 6px; font-size: 30px; font-weight: 750; letter-spacing: -.02em; }
+      .rc-status {
+        margin: 30px 0 0; padding-top: 16px; border-top: 1px solid rgba(20,46,71,.10);
+        color: var(--portal-muted); font-size: 12.5px; line-height: 1.7;
+      }
+      .rc-status__ok { color: #347A5B; }
+      .rc-status__bad { color: #A23C3C; }
+    </style>
+  </head>
+  <body>
+    <main class="portal">
+      <header class="portal-bar" style="height:64px">
+        <a class="portal-brand" href="index.html">
+          <span class="portal-compass" aria-hidden="true"><i></i></span>
+          <span>NESTIR</span>
+        </a>
+      </header>
+
+      <div class="rc">
+        <div class="rc-toolbar">
+          <div>
+            <h1 class="rc-h1">單據夾 SN</h1>
+            <p class="rc-sub">Drop a receipt photo · 雲端分析＋驗證 Harness</p>
+          </div>
+          <a class="rc-back" href="index.html">← 返回入口</a>
+        </div>
+
+        <label class="rc-drop" id="drop">
+          <span class="rc-drop__icon" aria-hidden="true">🧾</span>
+          <span class="rc-drop__strong">拖放單據圖片，或點擊選擇</span>
+          <span class="rc-drop__hint">支援 PNG / JPG / WebP · 建議小於 8MB · 或在手機拍照</span>
+          <input id="file" type="file" accept="image/*" capture="environment" />
+        </label>
+
+        <div class="rc-mode" role="group" aria-label="模式">
+          <button type="button" class="rc-mode__btn is-active" data-mode="scan">掃描單據</button>
+          <button type="button" class="rc-mode__btn" data-mode="classify">僅分類</button>
+        </div>
+        <textarea id="text" class="rc-text" rows="2" placeholder="（選用）貼上 OCR 文字或收據描述；「僅分類」模式必填"></textarea>
+
+        <div class="rc-preview" id="preview">
+          <img id="previewImg" alt="單據預覽" />
+          <div class="rc-preview__meta">
+            <div class="rc-preview__file" id="previewName"></div>
+            <div id="previewInfo"></div>
+          </div>
+        </div>
+
+        <div class="rc-actions" id="actions">
+          <button class="rc-btn" id="analyze" type="button">分析這張單據</button>
+        </div>
+
+        <div class="rc-progress" id="progress">
+          <div class="rc-progress__track"><div class="rc-progress__bar" id="bar"></div></div>
+          <p class="rc-progress__label" id="progressLabel">準備分析…</p>
+        </div>
+
+        <div class="rc-error" id="error"></div>
+
+        <div class="rc-result" id="result"></div>
+
+        <p class="rc-status" id="status">檢查雲端服務…</p>
+      </div>
+    </main>
+
+    <script type="module">
+      const ENDPOINT = "https://receipt-sn-api.conanchan0217.workers.dev/api/v1/scan";
+      const $ = (id) => document.getElementById(id);
+      const drop = $("drop"), fileInput = $("file"), preview = $("preview"),
+            previewImg = $("previewImg"), previewName = $("previewName"), previewInfo = $("previewInfo"),
+            actions = $("actions"), analyzeBtn = $("analyze"), progress = $("progress"),
+            bar = $("bar"), progressLabel = $("progressLabel"), errorBox = $("error"), resultBox = $("result"),
+            textInput = $("text"), statusEl = $("status");
+
+      let selectedFile = null, mode = "scan";
+
+      function setError(msg) { errorBox.textContent = msg; errorBox.style.display = msg ? "block" : "none"; }
+      function setProgress(label, pct) {
+        progress.style.display = label ? "block" : "none";
+        progressLabel.textContent = label || "";
+        if (bar) bar.style.width = (pct ?? 0) + "%";
+      }
+
+      function handleFile(file) {
+        setError("");
+        if (!file) return;
+        if (!file.type.startsWith("image/")) { setError("請選擇圖片檔案（PNG / JPG / WebP）。"); return; }
+        if (file.size > 8 * 1024 * 1024) { setError("圖片超過 8MB，請改用較小圖片。"); return; }
+        selectedFile = file;
+        preview.style.display = "flex";
+        actions.style.display = "block";
+        resultBox.style.display = "none";
+        progress.style.display = "none";
+        const reader = new FileReader();
+        reader.onload = (e) => { previewImg.src = e.target.result; };
+        reader.readAsDataURL(file);
+        previewName.textContent = file.name || "photo";
+        previewInfo.textContent = `${(file.size / 1024 / 1024).toFixed(1)} MB · ${file.type || "image"}`;
+      }
+
+      drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("is-over"); });
+      drop.addEventListener("dragleave", () => drop.classList.remove("is-over"));
+      drop.addEventListener("drop", (e) => {
+        e.preventDefault(); drop.classList.remove("is-over");
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) handleFile(file);
+      });
+      fileInput.addEventListener("change", (e) => handleFile(e.target.files && e.target.files[0]));
+
+      const fmt = (n) => {
+        if (n === null || n === undefined || n === "") return "—";
+        const num = Number(n);
+        return Number.isFinite(num) ? num.toLocaleString(undefined, { maximumFractionDigits: 2 }) : String(n);
+      };
+      const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+      const clean = (t) => String(t || "").replace(/<thinking>[\s\S]*?<\/thinking>/gi, "").replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+
+      function renderReceipt(receipt) {
+        const rc = receipt || {};
+        const items = Array.isArray(rc.items) ? rc.items : (Array.isArray(rc.line_items) ? rc.line_items : null);
+        const total = rc.total ?? rc.final_total ?? rc.total_amount;
+        const currency = rc.currency || "";
+        const rows = [];
+        rows.push('<div class="rc-card">');
+        rows.push('<div class="rc-receipt__head">');
+        rows.push('<div><div class="rc-receipt__title">' + esc(rc.merchant || "單據") + '</div>' +
+          '<div class="rc-receipt__meta">' + [esc(rc.date), esc(rc.location)].filter(Boolean).join(" · ") + '</div></div>');
+        rows.push('<div class="rc-total"><div class="rc-total__label">總額</div><div class="rc-total__value">' +
+          (currency ? esc(currency) + " " : "") + fmt(total) + '</div></div>');
+        rows.push('</div>');
+        if (items && items.length) {
+          rows.push('<table class="rc-items"><thead><tr><th>項目</th><th class="num">數量</th><th class="num">單價</th><th class="num">金額</th></tr></thead><tbody>');
+          for (const it of items) {
+            const name = it.name ?? it.item ?? it.description ?? it.title ?? "—";
+            const qty = it.quantity ?? it.qty;
+            const price = it.price ?? it.unit_price;
+            const amount = it.amount ?? it.total_price ?? (qty && price ? qty * price : null);
+            rows.push('<tr><td>' + esc(name) + '</td><td class="num">' + fmt(qty) + '</td><td class="num">' + fmt(price) + '</td><td class="num">' + fmt(amount) + '</td></tr>');
+          }
+          rows.push('</tbody></table>');
+        }
+        const details = [
+          ["小計", rc.subtotal], ["稅", rc.tax], ["服務費", rc.service_fee], ["折扣", rc.discount],
+          ["小費", rc.tip], ["分類", rc.category && esc(rc.category)], ["付款", rc.payment_method && esc(rc.payment_method)],
+        ].filter(([, v]) => v !== null && v !== undefined && v !== "");
+        if (details.length) {
+          rows.push('<dl class="rc-keyvals" style="margin-top:14px">' +
+            details.map(([k, v]) => '<div><dt>' + esc(k) + '</dt><dd>' + (k === "分類" || k === "付款" ? esc(v) : fmt(v)) + '</dd></div>').join("") +
+            '</dl>');
+        }
+        const summary = rc.summary_zh || rc.summary_en || rc.summary;
+        if (summary) rows.push('<p style="margin:14px 0 0;color:var(--portal-muted);font-size:13.5px;line-height:1.6">' + esc(summary) + '</p>');
+        rows.push('</div>');
+        return rows.join("");
+      }
+
+      function findValidation(d) {
+        if (d && d.validation) return d.validation;
+        if (d && Array.isArray(d.route_attempts)) {
+          const hit = d.route_attempts.find((a) => a && a.validation);
+          if (hit) return hit.validation;
+        }
+        return null;
+      }
+
+      function renderValidation(v) {
+        if (!v) return "";
+        const decision = v.decision || "unknown";
+        const badgeClass = { accepted: "accepted", corrected: "corrected", warning: "warning", rejected: "rejected" }[decision] || "warning";
+        const badgeText = { accepted: "已接受", corrected: "已修正", warning: "有保留", rejected: "已拒絕" }[decision] || decision;
+        const rules = Array.isArray(v.rules) ? v.rules : [];
+        let html = '<div class="rc-card"><div class="rc-card__title">驗證 Harness · ' + esc(decision) + '</div>';
+        html += '<div style="margin-bottom:14px"><span class="rc-badge rc-badge--' + badgeClass + '">' + esc(badgeText) + '</span></div>';
+        if (rules.length) {
+          html += '<div>' + rules.map((r) => {
+            const ok = !!r.passed;
+            return '<div class="rc-rule"><span class="rc-rule__mark ' + (ok ? "rc-rule__ok" : "rc-rule__no") + '">' + (ok ? "✓" : "✕") + '</span>' +
+              '<div><div><strong>' + esc(r.rule || "") + '</strong></div>' +
+              (r.detail ? '<div class="rc-rule__detail">' + esc(r.detail) + '</div>' : '') + '</div></div>';
+          }).join("") + '</div>';
+        } else {
+          html += '<p class="rc-raw" style="color:var(--portal-muted)">（無規則判決資料）</p>';
+        }
+        html += '</div>';
+        return html;
+      }
+
+      function renderDiagnostics(d) {
+        if (!d) return "";
+        const kv = (label, val, mono) => '<div><dt>' + esc(label) + '</dt><dd' + (mono ? ' class="mono"' : '') + '>' + esc(val) + '</dd></div>';
+        const usage = d.provider_usage || {};
+        let html = '<div class="rc-card"><div class="rc-card__title">診斷</div>';
+        html += '<dl class="rc-keyvals">' +
+          kv("路由", d.route_used || (d.attempted_routes ? d.attempted_routes.join(" → ") : "")) +
+          kv("模型", d.model_used) +
+          kv("Fallback", d.fallback_used ? "是" : "否") +
+          kv("耗時(ms)", d.total_duration_ms) +
+          kv("輸入tokens", usage.input_tokens) +
+          kv("輸出tokens", usage.output_tokens) +
+          kv("request_id", d.request_id, true) +
+          '</dl>';
+        html += '</div>';
+        return html;
+      }
+
+      async function analyze() {
+        if (mode === "classify") {
+          const text = textInput.value.trim();
+          if (!text) { setError("「僅分類」模式需要貼上文字（商戶名或描述）。"); return; }
+          actions.style.display = "none";
+          await runRequest({ text, mode: "classify" });
+          return;
+        }
+        if (!selectedFile && !textInput.value.trim()) {
+          setError("請選擇單據圖片，或貼上 OCR 文字。"); return;
+        }
+        if (selectedFile) {
+          setError(""); resultBox.style.display = "none";
+          actions.style.display = "none";
+          setProgress("讀取圖片…", 8);
+          const dataUrl = await new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(selectedFile); });
+          setProgress("提交雲端分析…", 22);
+          await runRequest({ image: dataUrl, text: "Analyze this receipt image." });
+        } else {
+          await runRequest({ text: textInput.value.trim() });
+        }
+      }
+
+      async function runRequest(payload) {
+        setError("");
+        let response;
+        try {
+          const res = await fetch(ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          setProgress("驗證與整理結果…", 64);
+          response = await res.json();
+          setProgress("完成", 100);
+          if (!res.ok) {
+            const code = response && response.error;
+            const msg = {
+              invalid_image: "圖片格式無效（base64 錯誤）。",
+              unsupported_image_type: "不支援的圖片格式（限 PNG / JPG / WebP）。",
+              empty_request: "未收到可分析的內容。",
+              invalid_json: "請求格式錯誤。",
+              request_too_large: "請求超過允許大小。",
+              rate_limited: "目前請求過多，請稍後再試。",
+              unauthorized: "未授權，請提供正確的存取 token。",
+              analysis_unavailable: "分析服務暫時不可用，請稍後再試。",
+              classification_unavailable: "分類服務暫時不可用，請稍後再試。",
+            }[code] || ("分析失敗：HTTP " + res.status);
+            setError(msg + (response && response.primary_error ? "（" + esc(response.primary_error) + "）" : ""));
+            return;
+          }
+        } catch (err) {
+          setProgress("", 0);
+          setError("無法連線到分析服務（可能是網路或 CORS）。請確認可存取 " + ENDPOINT);
+          return;
+        }
+        resultBox.style.display = "none";
+        const d = response.diagnostics || {};
+        const diagView = {
+          ...d,
+          route_used: response.route_used || d.route_used,
+          model_used: response.model_used || d.model_used,
+          fallback_used: response.fallback_used ?? d.fallback_used,
+          request_id: response.request_id || d.request_id,
+        };
+        const part = response.candidates && response.candidates[0] && response.candidates[0].content && response.candidates[0].content.parts && response.candidates[0].content.parts[0];
+        const rawText = part ? clean(part.text) : "";
+
+        let html = "";
+        if (mode === "classify") {
+          html += '<div class="rc-card"><div class="rc-card__title">分類結果</div>' +
+            '<div class="rc-category">' + esc(rawText || "—") + '</div></div>';
+        } else {
+          let receiptHTML = "";
+          let parsed = null;
+          try { parsed = JSON.parse(rawText); } catch (_e) { /* raw text */ }
+          if (parsed && typeof parsed === "object") receiptHTML = renderReceipt(parsed);
+          else if (rawText) receiptHTML = '<div class="rc-card"><div class="rc-card__title">目前結果（文字）</div><pre class="rc-raw">' + esc(rawText) + '</pre></div>';
+          if (receiptHTML) html += receiptHTML;
+          html += renderValidation(findValidation(diagView));
+          html += renderDiagnostics(diagView);
+        }
+        if (d.route_attempts && d.route_attempts.length) {
+          html += '<div class="rc-card"><div class="rc-card__title">路由嘗試</div>' +
+            d.route_attempts.map((a) => {
+              const ok = a.status === "success";
+              return '<div class="rc-rule"><span class="rc-rule__mark ' + (ok ? "rc-rule__ok" : "rc-rule__no") + '">' + (ok ? "✓" : "✕") + '</span>' +
+                '<div><div><strong>' + esc(a.route) + '</strong> · ' + esc(a.model || "") + '</div>' +
+                '<div class="rc-rule__detail">' + esc(a.status) + ' · ' + fmt(a.duration_ms) + 'ms' +
+                (a.error ? ' · ' + esc(a.error) : '') +
+                (a.usage ? ' · ' + esc(a.usage.input_tokens) + "in/" + esc(a.usage.output_tokens) + "out" : '') + '</div></div></div>';
+            }).join("") + '</div>';
+        }
+        resultBox.innerHTML = html;
+        resultBox.style.display = "block";
+        actions.style.display = "block";
+      }
+
+      document.querySelectorAll(".rc-mode__btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          mode = btn.dataset.mode;
+          document.querySelectorAll(".rc-mode__btn").forEach((b) => b.classList.toggle("is-active", b === btn));
+        });
+      });
+
+      const STATUS_URL = "https://receipt-sn-api.conanchan0217.workers.dev/api/v1/health/routing";
+      async function refreshStatus() {
+        try {
+          const res = await fetch(STATUS_URL);
+          const h = await res.json();
+          const budget = h.cloudflare_ai_budget;
+          const budgetText = budget ? ("雲端 AI 額度 " + (budget.remaining_neurons ?? "—") + " / " + (budget.limit_neurons ?? "—")) : "";
+          statusEl.innerHTML = '<span class="rc-status__ok">●</span> 雲端服務連線正常 · 主路由 <strong>' + esc(h.primary_route || "—") +
+            '</strong> · 模型 <strong>' + esc(h.cloudflare_ai_model || h.primary_route || "—") + '</strong>' +
+            (h.fallback_routes && h.fallback_routes.length ? ' · fallback ' + esc(h.fallback_routes.join(" → ")) : "") +
+            (budgetText ? ' · ' + esc(budgetText) : '') + ' · <span class="rc-status__ok">線上</span>';
+        } catch (e) {
+          statusEl.innerHTML = '<span class="rc-status__bad">●</span> 無法連線雲端服務：' + esc(STATUS_URL);
+        }
+      }
+      refreshStatus();
+
+      analyzeBtn.addEventListener("click", analyze);
+      setProgress("", 0);
+    </script>
+  </body>
+</html>

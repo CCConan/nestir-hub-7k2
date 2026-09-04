@@ -1,10 +1,12 @@
-/* NESTIR 世界入口 — 外層閘門 */
+/* NESTIR 世界入口 — 外層閘門（SN 共用平台標準 淺色）*/
 :root {
-  --portal-bg: #0A1E31;
-  --portal-ink: #142E47;
-  --portal-blue: #496576;
-  --portal-paper: #E9EAE7;
-  --portal-muted: #7E94A3;
+  --portal-bg: #E9EAE7;           /* 背景淺灰 — 共用平台主背景 */
+  --portal-ink: #142E47;          /* 極深藍 — 正文 */
+  --portal-blue: #496576;         /* 品牌藍 — 主動作 */
+  --portal-surface: #D7DCDD;      /* 背景灰 — 次層/卡片 */
+  --portal-paper: #142E47;        /* 淺底上的文字 = ink */
+  --portal-muted: rgba(20,46,71,.62);
+  --portal-grid: rgba(36,40,38,.045); /* 格線墨色 #242826 @4.5% */
 }
 
 * { box-sizing: border-box; }
@@ -26,8 +28,8 @@ body {
   margin: 0 auto;
   padding: 0 22px 60px;
   background-image:
-    linear-gradient(rgba(233, 234, 231, .04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(233, 234, 231, .04) 1px, transparent 1px);
+    linear-gradient(var(--portal-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--portal-grid) 1px, transparent 1px);
   background-size: 72px 72px;
   background-position: center;
 }
@@ -55,11 +57,11 @@ body {
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 1.5px solid #B9C6CE;
+  border: 1.5px solid var(--portal-blue);
   border-radius: 50%;
 }
 .portal-compass:before,
-.portal-compass:after { content: ""; position: absolute; background: #B9C6CE; }
+.portal-compass:after { content: ""; position: absolute; background: var(--portal-blue); }
 .portal-compass:before { width: 1px; height: calc(100% + 8px); }
 .portal-compass:after { height: 1px; width: calc(100% + 8px); }
 .portal-compass i {
@@ -84,7 +86,7 @@ body {
 .portal-hero p {
   max-width: 460px;
   margin: 0;
-  color: #B9C6CE;
+  color: var(--portal-muted);
   font-size: 20px;
   line-height: 1.5;
 }
@@ -104,7 +106,7 @@ body {
   font-size: 17px;
   transition: transform 85ms ease, background 220ms ease;
 }
-.portal-enter:hover { background: #5A7A8C; }
+.portal-enter:hover { background: #3A5465; }
 .portal-enter:active { transform: scale(.95); }
 .portal-enter span { transition: transform 200ms ease; }
 .portal-enter:hover span { transform: translateX(4px); }
@@ -121,9 +123,9 @@ body {
   align-items: center;
   gap: 14px;
   padding: 16px 18px;
-  border: 1px solid rgba(233, 234, 231, .12);
+  border: 1px solid rgba(20, 46, 71, .14);
   border-radius: 18px;
-  background: rgba(233, 234, 231, .04);
+  background: rgba(215, 220, 221, .5);
 }
 
 .portal-roster__dot {
@@ -150,8 +152,8 @@ body {
   transition: border-color .2s ease, background .2s ease, transform .2s ease;
 }
 .portal-roster__link:hover {
-  border-color: rgba(233, 234, 231, .34);
-  background: rgba(233, 234, 231, .08);
+  border-color: rgba(20, 46, 71, .34);
+  background: rgba(20, 46, 71, .08);
   transform: translateY(-1px);
 }
 

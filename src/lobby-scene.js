@@ -71,11 +71,11 @@ export const TOOLS = [
     pos: [2.2, -0.25, 2.3],
   },
   {
-    id: 'files',
-    name: '日常檔案',
-    zh: 'Receipt / PhotoID',
-    url: null,
-    active: false,
+    id: 'receipt',
+    name: '單據夾 SN',
+    zh: 'Receipt · 雲端驗證',
+    url: 'receipt.html',
+    active: true,
     color: '#A8836B',
     pos: [-0.85, 1.0, 3.1],
   },
@@ -168,7 +168,7 @@ fn calcNormal(p: vec3f) -> vec3f {
   let ndc = uv * 2.0 - 1.0;
   let dir = normalize(forward + TAN_HALF * ndc.x * params.aspect * right + TAN_HALF * ndc.y * up);
 
-  let bg = vec3f(0.012, 0.030, 0.055);
+  let bg = vec3f(0.914, 0.918, 0.906); /* #E9EAE7 淺色背景 */
   var col = bg;
   var t = 0.0;
 
@@ -204,7 +204,7 @@ fn calcNormal(p: vec3f) -> vec3f {
   }
 
   let r2 = dot(ndc, ndc);
-  col = col * (1.0 - 0.34 * r2);
+  col = col * (1.0 - 0.10 * r2);
 
   return vec4f(col, 1.0);
 }
