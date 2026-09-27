@@ -2,6 +2,7 @@
  * 2026-09-27：3D 方塊（superellipse）+ 卡片滑出；頂欄／設定面板／節點名牌沿用舊版。
  */
 :root {
+  --lobby-icon-scale: .62;        /* app icon 佔 3D 方塊幾大（0–1）：留白露出方塊顏色／厚度 */
   --lobby-bg: #E9EAE7;            /* 背景淺灰 — 主背景 */
   --lobby-ink: #142E47;           /* 極深藍 — 正文 */
   --lobby-blue: #496576;          /* 品牌藍 */
@@ -67,7 +68,7 @@ html, body {
 }
 .tile3d:hover { box-shadow: 0 16px 34px rgba(20,46,71,.30), inset 0 1px 0 #fff; }
 .tile3d img {
-  width: 84%; height: 84%;
+  width: 92%; height: 92%;
   object-fit: cover;
   border-radius: 24%;
   corner-shape: superellipse(4);
@@ -77,7 +78,7 @@ html, body {
   font-weight: 600;
   color: #fff;
   background: var(--node-color);
-  width: 84%; height: 84%;
+  width: 92%; height: 92%;
   display: grid;
   place-items: center;
   line-height: 1;

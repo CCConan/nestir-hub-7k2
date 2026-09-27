@@ -143,6 +143,11 @@ document.querySelector('#scrim').addEventListener('click', closeCard);
 
 // ---- 狀態 ----
 const STORAGE_KEY = 'nestir-lobby-mode';
+// app icon 佔 3D 方塊幾大（0–1）：留白畀方塊本身嘅顏色／厚度／光影露出嚟
+const ICON_SCALE = (() => {
+  const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lobby-icon-scale'));
+  return Number.isFinite(v) && v > 0.2 && v <= 1 ? v : 0.62;
+})();
 const PARALLAX = { x: 0.55, y: 0.4 }; // 抓握式：指標向右 → 畫面向右
 const canvas = document.querySelector('#scene');
 const tilesBox = document.querySelector('#tiles');
@@ -213,7 +218,9 @@ function updateTiles() {
     if (!p) { state.tiles[i].style.opacity = '0'; continue; }
     // 用方塊角落投影，得出螢幕上實際大小（同 3D 完全對齊）
     const px = project([c[0] + TILE_A, c[1], c[2]], state.camPos, state.camLook, w, h);
-    const size = Math.max(28, Math.abs(px.x - p.x) * 2);
+    // 方塊投影全闊 → app icon 只用其中 ICON_SCALE，其餘露出 3D 方塊
+    const full = Math.abs(px.x - p.x) * 2;
+    const size = Math.max(20, full * ICON_SCALE);
     state.tiles[i].style.opacity = '1';
     state.tiles[i].style.width = `${size.toFixed(1)}px`;
     state.tiles[i].style.height = `${size.toFixed(1)}px`;
