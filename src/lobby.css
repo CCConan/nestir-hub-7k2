@@ -61,9 +61,13 @@ html, body {
   display: grid;
   place-items: center;
   overflow: hidden;             /* 防止任何方形 icon 邊緣超出圓 */
-  background: rgba(255,255,255,.90);   /* 圓形底：90% 不透明 */
+  background: linear-gradient(148deg, #ffffff 0%, #F2F4F3 52%, #E3E7E6 100%);
   border-radius: 50%;
-  box-shadow: 0 12px 28px rgba(20,46,71,.26), 0 3px 8px rgba(20,46,71,.12), inset 0 1px 0 #fff;
+  box-shadow: inset 0 1px 0 #fff,
+              inset 3px 3px 8px rgba(255, 255, 255, .9),
+              inset -4px -5px 10px rgba(20, 46, 71, .10),
+              0 2px 3px rgba(20, 46, 71, .14),
+              0 24px 38px rgba(20, 46, 71, .20);
   transition: box-shadow .2s ease;
 }
 .tile3d:hover { box-shadow: 0 16px 34px rgba(20,46,71,.30), inset 0 1px 0 #fff; }
