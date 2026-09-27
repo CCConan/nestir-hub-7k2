@@ -1,98 +1,68 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NESTIR · 大廳</title>
-<style>
-  :root{--navy:#142E47;--steel:#496576;--bg:#E9EAE7}
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%;font-family:'Century Gothic','PingFang TC',system-ui,sans-serif;color:var(--navy);background:var(--bg)}
-  #scene{position:fixed;inset:0;width:100%;height:100%;display:block}
-  #tiles{position:fixed;inset:0;pointer-events:none;z-index:5}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#E9EAE7" />
+    <title>NESTIR · 大廳</title>
+    <link rel="stylesheet" href="src/lobby.css?v=20260927-1" />
+  </head>
+  <body class="lobby-body">
+    <div id="lobby">
+      <canvas id="scene" aria-label="NESTIR 3D 大廳"></canvas>
+      <div id="tiles" aria-hidden="false"></div>
+      <div id="labels" aria-hidden="true"></div>
+      <div id="fallback" hidden></div>
 
-  /* app icon 疊在 3D 方塊投影位置（Apple 連續曲率同 shader 一致） */
-  .tile3d{position:absolute;left:0;top:0;padding:0;border:0;pointer-events:auto;cursor:pointer;
-    display:grid;place-items:center;background:rgba(255,255,255,.94);
-    border-radius:22.4%;corner-shape:superellipse(4);
-    box-shadow:0 12px 26px rgba(20,46,71,.20), inset 0 1px 0 #fff;
-    transition:box-shadow .2s ease}
-  .tile3d:hover{box-shadow:0 16px 34px rgba(20,46,71,.30), inset 0 1px 0 #fff}
-  .tile3d img{width:84%;height:84%;object-fit:cover;border-radius:24%;corner-shape:superellipse(4);
-    border:1px solid rgba(20,46,71,.08)}
-  .tile3d .letter{font-weight:600;color:#fff;background:var(--node-color);
-    width:84%;height:84%;display:grid;place-items:center;line-height:1;
-    border-radius:24%;corner-shape:superellipse(4);letter-spacing:.01em}
-  .tile3d--soon{opacity:.62;filter:saturate(.55)}
-  .tile3d--soon .letter{background:color-mix(in srgb, var(--node-color) 60%, #b9c3cd)}
+      <header class="lobby-bar">
+        <a class="lobby-brand" href="index.html">
+          <span class="lobby-compass" aria-hidden="true"><i></i></span>
+          <span>NESTIR</span>
+        </a>
+        <span class="lobby-title">大廳</span>
+        <div class="lobby-actions">
+          <button id="settingsBtn" class="lobby-gear" type="button" aria-label="設定" aria-expanded="false">
+            <svg class="lobby-gear__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3.2"/>
+              <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.09a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.09a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/>
+            </svg>
+          </button>
+          <a class="lobby-exit" href="index.html">入口</a>
+        </div>
+      </header>
 
-  #hint{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:20;
-    background:rgba(20,46,71,.86);color:#fff;padding:9px 18px;border-radius:999px;
-    corner-shape:superellipse(4);font-size:13px;max-width:88vw;text-align:center}
-  h1.brand{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:20;margin:0}
-  h1.brand img{height:22px}
+      <div id="settingsPanel" class="settings-panel" hidden>
+        <div class="settings-panel__title">設定</div>
+        <div class="settings-row">
+          <span>介面模式</span>
+          <div class="settings-seg" role="group" aria-label="介面模式">
+            <button type="button" class="settings-seg__btn" data-mode="3d">3D 空間</button>
+            <button type="button" class="settings-seg__btn" data-mode="2d">2D 平面</button>
+          </div>
+        </div>
+        <p id="modeNote" class="settings-note"></p>
+        <button id="resetView" type="button" class="settings-reset">重置視角</button>
+      </div>
 
-  /* 卡片：由下往上滑出 */
-  #scrim{position:fixed;inset:0;background:rgba(8,16,26,.45);opacity:0;pointer-events:none;transition:opacity .32s ease;z-index:30}
-  #card{position:fixed;left:50%;bottom:0;width:min(440px,92vw);z-index:31;
-    transform:translate(-50%,115%);transition:transform .46s cubic-bezier(.16,.84,.28,1);
-    background:#fff;border-radius:34px;corner-shape:superellipse(4);padding:16px 24px 24px;
-    box-shadow:0 -12px 60px rgba(8,16,26,.45)}
-  body.card-open #scrim{opacity:1;pointer-events:auto}
-  body.card-open #card{transform:translate(-50%, calc(-50vh + 50%))}
-  #card .grab{width:44px;height:5px;margin:0 auto 14px;background:#d7dde4;border-radius:999px;corner-shape:superellipse(4)}
-  #card .head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
-  #card-icon{width:56px;height:56px;flex:none;display:grid;place-items:center;background:rgba(20,46,71,.06);
-    border-radius:18px;corner-shape:superellipse(4)}
-  #card-icon img{width:44px;height:44px;object-fit:cover;border-radius:13px;corner-shape:superellipse(4)}
-  #card-icon .letter{width:44px;height:44px;display:grid;place-items:center;color:#fff;font-weight:600;
-    background:var(--node-color);border-radius:13px;corner-shape:superellipse(4)}
-  #card-title{font-size:19px;margin:0}
-  #card-zh{color:var(--steel);font-size:13px;margin:4px 0 0}
-  #card .acts{display:flex;gap:12px}
-  .act{flex:1;text-decoration:none;color:#fff;background:var(--navy);border:0;cursor:pointer;
-    border-radius:24px;corner-shape:superellipse(4);padding:15px 12px 13px;
-    display:flex;flex-direction:column;align-items:center;gap:7px;font-size:14px;font-family:inherit}
-  .act span.ic{font-size:20px;line-height:1}
-  .act small{opacity:.78;font-size:11.5px}
-  .act.alt{background:#F2EFE7;color:var(--navy)}
-  .act--off{opacity:.45;cursor:not-allowed;pointer-events:none}
-  #card-close{position:absolute;top:10px;right:14px;border:0;background:transparent;color:var(--steel);font-size:19px;cursor:pointer}
+      <p id="hint" class="lobby-hint">載入中…</p>
 
-  #fallback{position:fixed;inset:0;z-index:10;background:var(--bg);overflow:auto;padding:28px}
-  #fallback h2{font-weight:600;font-size:18px;margin:0 0 16px}
-  .fb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
-  .fb-card{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;cursor:pointer;
-    background:#fff;border:0;padding:14px;border-radius:22px;corner-shape:superellipse(4);
-    box-shadow:0 8px 20px rgba(20,46,71,.10);font-family:inherit}
-  .fb-ic{width:40px;height:40px;display:grid;place-items:center;font-weight:600;color:#fff;overflow:hidden;
-    background:var(--node-color);border-radius:12px;corner-shape:superellipse(4)}
-  .fb-ic img{width:100%;height:100%;object-fit:cover}
-</style>
-</head>
-<body>
-<canvas id="scene" aria-label="NESTIR 3D 大廳"></canvas>
-<div id="tiles" aria-hidden="false"></div>
-<div id="hint">載入中…</div>
-<div id="fallback" hidden></div>
-
-<div id="scrim"></div>
-<section id="card" role="dialog" aria-modal="true">
-  <div class="grab"></div>
-  <button id="card-close" aria-label="關閉">✕</button>
-  <div class="head">
-    <div id="card-icon"></div>
-    <div>
-      <h2 id="card-title">—</h2>
-      <p id="card-zh">—</p>
+      <div id="scrim"></div>
+      <section id="card" role="dialog" aria-modal="true" aria-labelledby="card-title">
+        <div class="grab"></div>
+        <button id="card-close" aria-label="關閉">✕</button>
+        <div class="head">
+          <div id="card-icon"></div>
+          <div>
+            <h2 id="card-title">—</h2>
+            <p id="card-zh">—</p>
+          </div>
+        </div>
+        <div class="acts">
+          <a class="act" id="card-web" href="#"><span class="ic">🌐</span>網頁工具<small>直接用，唔使裝</small></a>
+          <a class="act alt" id="card-app" href="#"><span class="ic">🍎</span>App<small>去 App Store 下載</small></a>
+        </div>
+      </section>
     </div>
-  </div>
-  <div class="acts">
-    <a class="act" id="card-web" href="#"><span class="ic">🌐</span>網頁工具<small>直接用，唔使裝</small></a>
-    <a class="act alt" id="card-app" href="#"><span class="ic">🍎</span>App<small>去 App Store 下載</small></a>
-  </div>
-</section>
-
-<script type="module" src="lobby.bundle.js"></script>
-</body>
+    <script type="module" src="lobby.bundle.js"></script>
+  </body>
 </html>
