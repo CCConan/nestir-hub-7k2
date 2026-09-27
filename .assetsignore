@@ -1,0 +1,7 @@
+node_modules
+.git
+package.json
+.gitignore
+.assets_ignore
+.assetsignore
+.DS_Store
