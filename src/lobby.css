@@ -68,12 +68,12 @@ html, body {
 }
 .tile3d:hover { box-shadow: 0 16px 34px rgba(20,46,71,.30), inset 0 1px 0 #fff; }
 .tile3d img {
-  width: 100%; height: 100%;      /* 撐滿圓形，contain 留白會被白圓底吸收 */
+  width: 76%; height: 76%;        /* app icon = 圓角方格，放喺白圓底中央（唔會被圓形剪走四角） */
   object-fit: contain;
-  border-radius: 50%;
-  padding: 10%;                   /* icon 離圓邊留 10% 呼吸位（防止觸邊） */
+  border-radius: 24%;             /* 手機 App icon 圓角（Apple 風格） */
+  padding: 0;
   box-sizing: border-box;
-}
+  filter: drop-shadow(0 1px 2px rgba(20,46,71,.18));
 }
 .tile3d .letter {
   font-weight: 700;
@@ -348,9 +348,9 @@ body.card-open #card { transform: translate(-50%, calc(-50vh + 50%)); }
   border-radius: 50%;
 }
 #card-icon img {
-  width: 44px; height: 44px;
-  object-fit: cover;
-  border-radius: 50%;
+  width: 42px; height: 42px;
+  object-fit: contain;
+  border-radius: 24%;
 }
 #card-icon .letter {
   width: 44px; height: 44px;
@@ -446,7 +446,7 @@ body.card-open #card { transform: translate(-50%, calc(-50vh + 50%)); }
   font-size: 17px;
   overflow: hidden;
 }
-.fallback-card__icon img { width: 100%; height: 100%; object-fit: cover; }
+.fallback-card__icon img { width: 76%; height: 76%; object-fit: contain; border-radius: 24%; }
 
 .fallback-card__body { display: flex; flex-direction: column; gap: 2px; }
 .fallback-card__body strong { font-size: 16px; }
