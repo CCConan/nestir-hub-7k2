@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#E9EAE7" />
+    <title>小屋 Hut · NESTIR 世界場景</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="src/site.css?v=20260901-3" />
+    <style>
+      .scene-hero{margin:30px 0 0}
+      .scene-hero img{width:100%;display:block;border-radius:26px}
+      .scene-hero figcaption{margin-top:10px;font-size:13px;color:#496576;line-height:1.5}
+      .scene-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:30px 0 0}
+      .scene-meta div{background:#F4F7F7;border-radius:26px;padding:18px 20px;box-shadow:0 6px 16px #47000000, inset -1px -1px 0 #DDFFFFFF}
+      .scene-meta b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#496576;font-weight:600;margin-bottom:6px}
+      .scene-meta span{font-size:15px;line-height:1.5;color:#142E47}
+      .prog{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+      .prog th,.prog td{text-align:left;padding:9px 10px;border-bottom:1px solid #D7DCDD}
+      .prog th{color:#496576;font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+      .scene-nav{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:34px}
+    </style>
+  </head>
+  <body>
+    <nav class="site-nav">
+      <a class="site-nav__brand" href="index.html"><span class="site-nav__compass" aria-hidden="true"><i></i></span><span>NESTIR</span></a>
+      <div class="site-nav__links">
+        <a class="site-nav__link" href="index.html">Home</a>
+        <a class="site-nav__link" href="story.html">Story</a>
+        <a class="site-nav__link" href="source.html">Source Share</a>
+        <a class="site-nav__link" href="myroom.html">My Room</a>
+        <a class="site-nav__link" href="printshop.html">3D Print Shop</a>
+        <a class="site-nav__link" href="wealth.html">全智富</a>
+        <a class="site-nav__link" href="words.html">Words</a>
+        <a class="site-nav__link" href="account.html">帳戶</a>
+      </div>
+    </nav>
+
+    <section class="section" style="padding-top:70px">
+      <div class="section__inner">
+        <p class="eyebrow">世界場景 · 1 / 7 · 家</p>
+        <h1 class="section-title" style="font-size:clamp(38px,6vw,64px)">小屋 Hut</h1>
+        <p class="lead" style="max-width:680px">小屋係整個世界嘅起點：使用者嘅家、個人節點。草圖 B 寫得最清楚——「先有一個家（HUT），裏頭有工具、有花園、有咖啡店，通往外面的世界，還有一個會跟你對話的 AI。」</p>
+        <p class="lead" style="max-width:680px">呢一頁係概念圖階段：先定風格（lo-fi cyberpunk 衛星城、abundance、明亮整潔），等你可以一眼睇到進度。</p>
+        <figure class="scene-hero">
+          <img src="assets/scenes/hut.jpg" alt="小屋 Hut 概念圖" />
+          <figcaption>概念圖：MiniMax 生成（2026-09-27）· 用途＝場景風格定調參考，之後會由真 3D 場景取代（見《入口設計規格_3D虛擬世界.md》）</figcaption>
+        </figure>
+        <div class="scene-meta">
+          <div><b>場景角色</b><span>使用者嘅家／個人節點</span></div>
+          <div><b>左右滑動</b><span>✅ 規格要求（揭露角度＋按鈕）</span></div>
+          <div><b>工具按鈕</b><span>✅ 規格要求（App icon 圓角方格）</span></div>
+          <div><b>出場次序</b><span>① 第一場景</span></div>
+        </div>
+      </div>
+    </section>
+    <section class="section section--warm">
+      <div class="section__inner">
+        <p class="eyebrow">設計草圖上嘅要求</p>
+        <h2 class="section-title">草圖點寫呢個場景</h2>
+        <ul style="max-width:680px;margin:18px 0 0;padding-left:20px;line-height:1.75;color:#142E47">
+            <li>TOOLS IN HUT — 工具就放喺屋裏面</li>
+            <li>FEED PET / DOG — 餵寵物</li>
+            <li>AUTO · FADE IN WITH ANIMATIONS — 自動、淡入動畫</li>
+            <li>AI PAGE — future is / what is / nature is（AI 用三個問題同你打招呼）</li>
+            <li>Hut と 工具 — 小屋與工具</li>
+        </ul>
+      </div>
+    </section>
+    <section class="section" style="padding-top:20px;padding-bottom:80px">
+      <div class="section__inner">
+        <p class="eyebrow">進度</p>
+        <h2 class="section-title">呢一頁做到邊</h2>
+        <table class="prog">
+          <thead><tr><th>項目</th><th>狀態</th></tr></thead>
+          <tbody>
+            <tr><td>場景概念圖（MiniMax）</td><td>✅ 完成 — 2026-09-27</td></tr>
+            <tr><td>頁面版面（網頁）</td><td>✅ 完成 — 本頁</td></tr>
+            <tr><td>3D 場景（Godot／WebGPU）</td><td>⏳ 未做</td></tr>
+            <tr><td>左右滑動鏡頭</td><td>⏳ 未做</td></tr>
+            <tr><td>工具按鈕（9 個 App icon）</td><td>⏳ 未做（可借用大廳節點）</td></tr>
+          </tbody>
+        </table>
+      <div class="scene-nav">
+        <a class="btn btn--ghost" href="index.html">← 入口</a>
+        <a class="btn" href="scenes.html">世界總覽</a>
+        <a class="btn btn--ghost" href="scene-garden.html">下一站：後花園 →</a>
+      </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span class="site-footer__brand">NESTIR</span>
+      <span class="site-footer__copy">© 2024 by <b>Astro Journey to Satellite</b>. 一個安放身心、仍保有人類溫度的空間。</span>
+      <a class="site-footer__home" href="scenes.html">◎ 世界場景</a>
+    </footer>
+  </body>
+</html>

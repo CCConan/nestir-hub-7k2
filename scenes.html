@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#E9EAE7" />
+    <title>世界場景 World Scenes · NESTIR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="src/site.css?v=20260901-3" />
+    <style>
+      .world-hero{margin:30px 0 0}
+      .world-hero img{width:100%;display:block;border-radius:26px}
+      .world-hero figcaption{margin-top:10px;font-size:13px;color:#496576;line-height:1.5}
+      .sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-top:26px}
+      .sc{background:#F4F7F7;border-radius:26px;overflow:hidden;box-shadow:0 6px 16px #47000000, inset -1px -1px 0 #DDFFFFFF;text-decoration:none;color:inherit;display:block}
+      .sc img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+      .sc__b{padding:18px 20px 22px}
+      .sc__k{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#496576;font-weight:600}
+      .sc__t{font-size:22px;margin:6px 0 6px;color:#142E47}
+      .sc__d{font-size:14px;line-height:1.55;color:#142E47;opacity:.85}
+      .sc__s{margin-top:12px;font-size:12.5px;color:#496576}
+      .prog{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+      .prog th,.prog td{text-align:left;padding:9px 10px;border-bottom:1px solid #D7DCDD}
+      .prog th{color:#496576;font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+      .seq{margin-top:18px;font-size:14px;line-height:1.8;color:#142E47}
+    </style>
+  </head>
+  <body>
+    <nav class="site-nav">
+      <a class="site-nav__brand" href="index.html"><span class="site-nav__compass" aria-hidden="true"><i></i></span><span>NESTIR</span></a>
+      <div class="site-nav__links">
+        <a class="site-nav__link" href="index.html">Home</a>
+        <a class="site-nav__link" href="story.html">Story</a>
+        <a class="site-nav__link" href="source.html">Source Share</a>
+        <a class="site-nav__link" href="myroom.html">My Room</a>
+        <a class="site-nav__link" href="printshop.html">3D Print Shop</a>
+        <a class="site-nav__link" href="wealth.html">全智富</a>
+        <a class="site-nav__link" href="words.html">Words</a>
+        <a class="site-nav__link" href="account.html">帳戶</a>
+      </div>
+    </nav>
+
+    <section class="section" style="padding-top:70px">
+      <div class="section__inner">
+        <p class="eyebrow">World Scenes · 草圖場景順序</p>
+        <h1 class="section-title" style="font-size:clamp(38px,6vw,64px)">世界場景總覽</h1>
+        <p class="lead" style="max-width:680px">呢度係《入口設計規格_3D虛擬世界.md》入面嘅場景序列：由小屋（家）出發 → 後花園 → 大街 → 咖啡廳 → 野外探險（森林遺跡／冰天雪地／外太空衛星城）。上下滑動切場景、左右滑動改角度，係規格定落嘅導航方式。</p>
+        <p class="lead" style="max-width:680px">每一頁都放住該場景嘅 <b>概念圖</b>（MiniMax 生成，跟 STYLE_GUIDE v4）＋ 草圖要求 ＋ 進度表，方便你一眼睇到做到邊。真 3D 場景會逐步取代概念圖。</p>
+        <figure class="world-hero">
+          <img src="assets/scenes/world.jpg" alt="衛星城黃昏遠景 概念圖" />
+          <figcaption>衛星城黃昏遠景（概念圖：MiniMax 生成 2026-09-27）</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section section--warm">
+      <div class="section__inner">
+        <p class="eyebrow">四個場景・概念圖已完成</p>
+        <h2 class="section-title">場景卡</h2>
+        <div class="sc-grid">
+          <a class="sc" href="scene-hut.html"><img src="assets/scenes/hut.jpg" alt="小屋" /><span class="sc__b"><span class="sc__k">1 / 7 · 家</span><span class="sc__t">小屋 Hut</span><span class="sc__d">使用者嘅家／個人節點。TOOLS IN HUT：所有工具放喺屋裏面。</span><span class="sc__s">概念圖 ✅ · 3D ⏳ · 工具按鈕 ⏳</span></span></a>
+          <a class="sc" href="scene-garden.html"><img src="assets/scenes/garden.jpg" alt="後花園" /><span class="sc__b"><span class="sc__k">2 / 7 · 生活／記憶</span><span class="sc__t">後花園 Garden</span><span class="sc__d">種嘢、晾衫、放工具、留住記憶；串住資訊流（MONS FEED）。</span><span class="sc__s">概念圖 ✅ · 3D ⏳ · 工具按鈕 ⏳</span></span></a>
+          <a class="sc" href="scene-street.html"><img src="assets/scenes/street.jpg" alt="大街" /><span class="sc__b"><span class="sc__k">3 / 7 · 中繼／交流</span><span class="sc__t">大街 Street</span><span class="sc__d">由家走出去嘅第一條街；EXPLORE：你嘅目標、你嘅停留、你要去邊。</span><span class="sc__s">概念圖 ✅ · 3D ⏳ · 工具按鈕 ⏳</span></span></a>
+          <a class="sc" href="scene-cafe.html"><img src="assets/scenes/cafe.jpg" alt="咖啡廳" /><span class="sc__b"><span class="sc__k">4 / 7 · 社交／內容</span><span class="sc__t">咖啡廳 Café</span><span class="sc__d">坐低傾偈嘅地方；RELOAD CAFE（+ STORE）：連住店舖。</span><span class="sc__s">概念圖 ✅ · 3D ⏳</span></span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:26px;padding-bottom:80px">
+      <div class="section__inner">
+        <p class="eyebrow">進度總表</p>
+        <h2 class="section-title">全部場景狀態</h2>
+        <table class="prog">
+          <thead><tr><th>場景</th><th>角色</th><th>概念圖</th><th>3D</th><th>工具按鈕</th></tr></thead>
+          <tbody>
+            <tr><td>① 小屋 Hut</td><td>家／個人節點</td><td>✅ 完成</td><td>⏳</td><td>⏳（9 個 App icon）</td></tr>
+            <tr><td>② 後花園 Garden</td><td>生活／記憶</td><td>✅ 完成</td><td>⏳</td><td>⏳</td></tr>
+            <tr><td>③ 大街 Street</td><td>中繼／交流</td><td>✅ 完成</td><td>⏳</td><td>⏳</td></tr>
+            <tr><td>④ 咖啡廳 Café</td><td>社交／內容</td><td>✅ 完成</td><td>⏳</td><td>—（規格暫無）</td></tr>
+            <tr><td>⑤ 森林・古代遺跡</td><td>歷史／探索</td><td>⏳ 未做</td><td>⏳</td><td>—</td></tr>
+            <tr><td>⑥ 冰天雪地</td><td>自然／極境</td><td>⏳ 未做</td><td>⏳</td><td>—</td></tr>
+            <tr><td>⑦ 外太空・衛星城市</td><td>未來／文明遠景</td><td>⏳ 未做</td><td>⏳</td><td>—</td></tr>
+          </tbody>
+        </table>
+        <p class="seq">導航：<b>上下滑動</b>＝切換場景（順序）；<b>左右滑動</b>＝同一地點唔同角度，揭露唔同按鈕。桌面滑鼠同手機觸控共用同一套世界。</p>
+        <p class="seq" style="color:#496576;font-size:13px">註：本頁同四個場景頁都係新增頁面，冇改動任何現有頁面內容；「世界」暫時未加入全站頂欄，要靠本頁互link。</p>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span class="site-footer__brand">NESTIR</span>
+      <span class="site-footer__copy">© 2024 by <b>Astro Journey to Satellite</b>. 一個安放身心、仍保有人類溫度的空間。</span>
+      <a class="site-footer__home" href="index.html">⌂ HOME</a>
+    </footer>
+  </body>
+</html>
