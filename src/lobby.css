@@ -67,6 +67,7 @@ html, body {
   transition: box-shadow .2s ease;
 }
 .tile3d:hover { box-shadow: 0 16px 34px rgba(20,46,71,.30), inset 0 1px 0 #fff; }
+.tile3d { container-type: size; }     /* 俾 .letter 用 cqw 跟尺寸縮放 */
 .tile3d img {
   width: 76%; height: 76%;        /* app icon = 圓角方格，放喺白圓底中央（唔會被圓形剪走四角） */
   object-fit: contain;
@@ -77,17 +78,19 @@ html, body {
 }
 .tile3d .letter {
   font-weight: 700;
-  font-size: clamp(34px, 14%, 64px);   /* 跟方塊大小縮放 */
+  font-size: clamp(24px, 12%, 52px);
+  font-size: 30cqw;                   /* 跟白圓底闊度縮放（每格一致） */
   color: #fff;
   background: var(--node-color);
   width: 100%; height: 100%;
   display: grid;
   place-items: center;
   line-height: 1;
-  border-radius: 50%;
+  border-radius: 24%;              /* 同 app icon 一致：圓角方格 */
   letter-spacing: .01em;
   text-shadow: 0 1px 2px rgba(0,0,0,.18);   /* 微陰影 */
-  padding: 10%;
+  width: 76%; height: 76%;
+  padding: 0;
   box-sizing: border-box;
 }
 .tile3d--soon .letter { background: color-mix(in srgb, var(--node-color) 60%, #b9c3cd); }

@@ -112,7 +112,7 @@ function openCard(i) {
   if (t.icon) iconBox.appendChild(el('img', null)).src = t.icon;
   else {
     const ls = iconBox.appendChild(el('span', 'letter', initials(t)));
-    ls.style.background = t.color; ls.style.borderRadius = '50%'; ls.style.padding = '10%'; ls.style.boxSizing = 'border-box';
+    ls.style.background = t.color; ls.style.borderRadius = '24%'; ls.style.padding = '0'; ls.style.boxSizing = 'border-box';
   }
 
   if (t.url) {
@@ -207,7 +207,7 @@ function buildTiles() {
     if (t.icon) box.appendChild(el('img', null)).src = t.icon;
     else {
       const ls2 = box.appendChild(el('span', 'letter', initials(t)));
-      ls2.style.background = t.color; ls2.style.borderRadius = '50%'; ls2.style.padding = '10%'; ls2.style.boxSizing = 'border-box';
+      ls2.style.background = t.color; ls2.style.borderRadius = '24%'; ls2.style.padding = '0'; ls2.style.boxSizing = 'border-box';
     }
     box.addEventListener('click', () => openCard(i));
     tilesBox.appendChild(box);
