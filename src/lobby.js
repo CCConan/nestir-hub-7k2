@@ -110,7 +110,10 @@ function openCard(i) {
   iconBox.innerHTML = '';
   iconBox.style.setProperty('--node-color', t.color);
   if (t.icon) iconBox.appendChild(el('img', null)).src = t.icon;
-  else iconBox.appendChild(el('span', 'letter', initials(t)));
+  else {
+    const ls = iconBox.appendChild(el('span', 'letter', initials(t)));
+    ls.style.background = t.color; ls.style.borderRadius = '50%'; ls.style.padding = '10%'; ls.style.boxSizing = 'border-box';
+  }
 
   if (t.url) {
     webBtn.href = t.url;
@@ -202,7 +205,10 @@ function buildTiles() {
     box.type = 'button';
     box.setAttribute('aria-label', t.name);
     if (t.icon) box.appendChild(el('img', null)).src = t.icon;
-    else box.appendChild(el('span', 'letter', initials(t)));
+    else {
+      const ls2 = box.appendChild(el('span', 'letter', initials(t)));
+      ls2.style.background = t.color; ls2.style.borderRadius = '50%'; ls2.style.padding = '10%'; ls2.style.boxSizing = 'border-box';
+    }
     box.addEventListener('click', () => openCard(i));
     tilesBox.appendChild(box);
     return box;

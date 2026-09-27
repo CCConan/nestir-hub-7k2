@@ -25,12 +25,12 @@ export const TOOLS = [
   { id: 'missionrelay', name: 'MissionRelay SN', zh: '中繼與互助', status: 'Live', active: true,
     url: 'missionrelay.html', appUrl: null, color: '#CC7A00', icon: null, pos: [X[1], 0.95, R1] },
   { id: 'receipt', name: '張單據夾', zh: 'Receipt · 雲端驗證', status: 'Live', active: true,
-    url: 'receipt.html', appUrl: null, color: '#A8836B', icon: 'assets/apps/receipt-app-256.png', pos: [X[2], 0.95, R1] },
+    url: 'receipt.html', appUrl: null, color: '#A8836B', icon: 'assets/apps/receipt-app-512.png', pos: [X[2], 0.95, R1] },
 
   { id: 'tubelist', name: 'TubeList SN', zh: 'YouTube 清單整理', status: 'Beta', active: true,
-    url: null, appUrl: null, color: '#C4302B', icon: 'assets/apps/tubelist-app-256.png', pos: [X[0], 0, R2] },
+    url: null, appUrl: null, color: '#C4302B', icon: 'assets/apps/tubelist-app-512.png', pos: [X[0], 0, R2] },
   { id: 'tripboard', name: 'TripBoard SN', zh: '遠行與行程', status: 'In development', active: false,
-    url: null, appUrl: null, color: '#6B7FA3', icon: 'assets/apps/tripboard-app-256.png', pos: [X[1], 0, R2] },
+    url: null, appUrl: null, color: '#6B7FA3', icon: 'assets/apps/tripboard-app-512.png', pos: [X[1], 0, R2] },
   { id: 'bodygravity', name: 'BodyGravity SN', zh: '身體準備', status: 'In development', active: false,
     url: null, appUrl: null, color: '#3E7C8C', icon: null, pos: [X[2], 0, R2] },
 

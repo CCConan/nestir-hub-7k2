@@ -60,32 +60,37 @@ html, body {
   cursor: pointer;
   display: grid;
   place-items: center;
-  background: rgba(255,255,255,.94);
-  border-radius: 22.4%;
-  corner-shape: superellipse(4);
-  box-shadow: 0 12px 26px rgba(20,46,71,.20), inset 0 1px 0 #fff;
+  overflow: hidden;             /* 防止任何方形 icon 邊緣超出圓 */
+  background: rgba(255,255,255,.90);   /* 圓形底：90% 不透明 */
+  border-radius: 50%;
+  box-shadow: 0 12px 28px rgba(20,46,71,.26), 0 3px 8px rgba(20,46,71,.12), inset 0 1px 0 #fff;
   transition: box-shadow .2s ease;
 }
 .tile3d:hover { box-shadow: 0 16px 34px rgba(20,46,71,.30), inset 0 1px 0 #fff; }
 .tile3d img {
-  width: 92%; height: 92%;
-  object-fit: cover;
-  border-radius: 24%;
-  corner-shape: superellipse(4);
-  border: 1px solid rgba(20,46,71,.08);
+  width: 100%; height: 100%;      /* 撐滿圓形，contain 留白會被白圓底吸收 */
+  object-fit: contain;
+  border-radius: 50%;
+  padding: 10%;                   /* icon 離圓邊留 10% 呼吸位（防止觸邊） */
+  box-sizing: border-box;
+}
 }
 .tile3d .letter {
-  font-weight: 600;
+  font-weight: 700;
+  font-size: clamp(34px, 14%, 64px);   /* 跟方塊大小縮放 */
   color: #fff;
   background: var(--node-color);
-  width: 92%; height: 92%;
+  width: 100%; height: 100%;
   display: grid;
   place-items: center;
   line-height: 1;
-  border-radius: 24%;
-  corner-shape: superellipse(4);
+  border-radius: 50%;
   letter-spacing: .01em;
+  text-shadow: 0 1px 2px rgba(0,0,0,.18);   /* 微陰影 */
+  padding: 10%;
+  box-sizing: border-box;
 }
+.tile3d--soon .letter { background: color-mix(in srgb, var(--node-color) 60%, #b9c3cd); }
 .tile3d--soon { opacity: .62; filter: saturate(.55); }
 .tile3d--soon .letter { background: color-mix(in srgb, var(--node-color) 60%, #b9c3cd); }
 
@@ -340,22 +345,19 @@ body.card-open #card { transform: translate(-50%, calc(-50vh + 50%)); }
   width: 56px; height: 56px; flex: none;
   display: grid; place-items: center;
   background: rgba(20,46,71,.06);
-  border-radius: 18px;
-  corner-shape: superellipse(4);
+  border-radius: 50%;
 }
 #card-icon img {
   width: 44px; height: 44px;
   object-fit: cover;
-  border-radius: 13px;
-  corner-shape: superellipse(4);
+  border-radius: 50%;
 }
 #card-icon .letter {
   width: 44px; height: 44px;
   display: grid; place-items: center;
   color: #fff; font-weight: 600;
   background: var(--node-color);
-  border-radius: 13px;
-  corner-shape: superellipse(4);
+  border-radius: 50%;
 }
 #card-title { font-size: 19px; margin: 0; }
 #card-zh { color: var(--steel); font-size: 13px; margin: 4px 0 0; }
@@ -437,8 +439,7 @@ body.card-open #card { transform: translate(-50%, calc(-50vh + 50%)); }
   place-items: center;
   width: 52px;
   height: 52px;
-  border-radius: 16px;
-  corner-shape: superellipse(4);
+  border-radius: 50%;
   background: var(--node-color, #496576);
   color: #fff;
   font-weight: 800;
