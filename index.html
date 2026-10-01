@@ -2,61 +2,129 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#E9EAE7" />    <title>NESTIR · 世界入口</title>
-    <link rel="stylesheet" href="src/portal.css?v=20260901-2" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#E9EAE7" />
+    <title>NESTIR · 另一個空間 — Astro Journey to Satellite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="src/site.css?v=20260901-3" />
   </head>
   <body>
-    <main class="portal">
-      <header class="portal-bar">
-        <a class="portal-brand" href="index.html">
-          <span class="portal-compass" aria-hidden="true"><i></i></span>
-          <span>NESTIR</span>
-        </a>
-      </header>
+    <nav class="site-nav">
+      <a class="site-nav__brand" href="index.html"><span class="site-nav__compass" aria-hidden="true"><i></i></span><span>NESTIR</span></a>
+      <div class="site-nav__links">
+        <a class="site-nav__link is-active" href="index.html">Home</a>
+        <a class="site-nav__link" href="story.html">Story</a>
+        <a class="site-nav__link" href="source.html">Source Share</a>
+        <a class="site-nav__link" href="myroom.html">My Room</a>
+        <a class="site-nav__link" href="printshop.html">3D Print Shop</a>
+        <a class="site-nav__link" href="wealth.html">全智富</a>
+        <a class="site-nav__link" href="words.html">Words</a>
+        <a class="site-nav__link site-nav__link--acct" href="account.html">帳戶 <span aria-hidden="true">︿</span></a>
+      </div>
+    </nav>
 
-      <section class="portal-hero">
-        <h1>NESTIR 世界入口</h1>
-        <p>由一個真實需要開始，認識工具、故事與可探索的世界。</p>
-        <a class="portal-enter" href="lobby.html">進入大廳 <span aria-hidden="true">→</span></a>
-      </section>
+    <header class="site-hero">
+      <div class="site-hero__scene" aria-hidden="true"></div>
+      <div class="site-hero__window" aria-hidden="true">
+        <div class="site-hero__city"></div>
+      </div>
+      <div class="site-hero__dust" aria-hidden="true"></div>
+      <div class="site-hero__inner">
+        <p class="site-hero__eyebrow">NESTIR · Astro Journey to Satellite</p>
+        <h1 class="site-hero__title">Click and<br /><em>continue your journey</em></h1>
+        <p class="site-hero__sub">Living in … Satellite。一間看得見遠方的房，一個能安放身心、仍保有溫度與盼望的所在。</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a class="btn" href="lobby.html">進入世界大廳</a>
+          <a class="btn btn--ghost" href="myroom.html">我的房間</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>72</b><span>公里外的衛星城</span></div>
+          <div class="stat"><b>1</b><span>張安放自己的床</span></div>
+          <div class="stat"><b>∞</b><span>對未來的盼望</span></div>
+        </div>
+      </div>
+    </header>
 
-      <section class="portal-roster">
-        <a class="portal-roster__item portal-roster__link" href="https://poplist.studionestir.com/" target="_blank" rel="noopener">
-          <span class="portal-roster__dot" style="--c:#347A5B"></span>
-          <span><strong>PopList SN</strong><em>現場視覺查詢</em></span>
-        </a>
-        <a class="portal-roster__item portal-roster__link" href="https://missionrelay.studionestir.com/" target="_blank" rel="noopener">
-          <span class="portal-roster__dot" style="--c:#CC7A00"></span>
-          <span><strong>MissionRelay SN</strong><em>中繼與互助</em></span>
-        </a>
-        <div class="portal-roster__item">
-          <span class="portal-roster__dot" style="--c:#C2571F"></span>
-          <span><strong>記憶地圖</strong><em>食物・回憶 3D 地球</em></span>
+    <section class="section">
+      <div class="section__inner split">
+        <div>
+          <p class="eyebrow">Another Space</p>
+          <h2 class="section-title">走進來，就像踏進了另一個空間</h2>
+          <p class="lead">這裡不是繁華的市中心，而是遠方一座安靜的衛星城。你獨自生活，卻從未真正孤單——因為每一件被細心打造的物件、每一段被溫柔寫下的話語，都在提醒你：人類的溫度，從不會因為距離而冷卻。</p>
+          <p class="lead">我們相信，在偏遠的角落、在電腦螢幕的另一端、在通往宇宙的長途上，仍然有人願意為你留一盞燈、煮一杯熱茶、把日子過得有盼望。</p>
         </div>
-        <div class="portal-roster__item">
-          <span class="portal-roster__dot" style="--c:#3E7C8C"></span>
-          <span><strong>BodyGravity SN</strong><em>身體準備</em></span>
+        <div>
+          <p class="eyebrow">Warmth, Hope</p>
+          <h2 class="section-title">把日子，過成一件值得收藏的作品</h2>
+          <p class="lead">從一個真實的需要開始：一張舒服的床、一盞透光的燈、一隻陪你生活的皿。NESTIR 以 3D 打印與設計，把「家」的溫柔與「遠方」的廣闊，織進每一件日常。</p>
+          <p class="lead">在某個獨處的夜晚，願你在這裡找到安心與力量。</p>
         </div>
-        <div class="portal-roster__item">
-          <span class="portal-roster__dot" style="--c:#6B7FA3"></span>
-          <span><strong>TripBoard SN</strong><em>遠行與行程</em></span>
-        </div>
-        <div class="portal-roster__item">
-          <span class="portal-roster__dot" style="--c:#8A6DA8"></span>
-          <span><strong>知識探索</strong><em>Knowledge Cards / TubeList</em></span>
-        </div>
-        <a class="portal-roster__item portal-roster__link" href="receipt.html">
-          <span class="portal-roster__dot" style="--c:#A8836B"></span>
-          <span><strong>單據夾 SN</strong><em>Receipt · 雲端分析與總額驗證</em></span>
-        </a>
-        <div class="portal-roster__item">
-          <span class="portal-roster__dot" style="--c:#C9A24B"></span>
-          <span><strong>NanaHub</strong><em>家與社群</em></span>
-        </div>
-      </section>
+      </div>
+    </section>
 
-      <p class="portal-note">工具各自獨立、可從網址直接進入；無需安裝 App 或建立帳號即可開始。</p>
-    </main>
+    <section class="section section--warm">
+      <div class="section__inner center">
+        <p class="eyebrow">My Room</p>
+        <h2 class="section-title">屬於你的生活空間</h2>
+        <p class="lead">一扇望向衛星城的窗，一段關於獨處與盼望的獨白。</p>
+        <div class="card-grid">
+          <a class="card card--room" href="myroom.html">
+            <div class="card__media"><span class="card__media-icon">🛏️</span></div>
+            <div class="card__body">
+              <span class="card__kicker">Living Style Gallery</span>
+              <h3 class="card__title">我的房間</h3>
+              <p class="card__excerpt">在獨處中安頓心靈；在沉思裡，讓智慧悄然萌生。</p>
+              <span class="card__meta">閱讀獨白 →</span>
+            </div>
+          </a>
+          <a class="card" href="lobby.html">
+            <div class="card__media card__media--dusk"><span class="card__media-icon">🌌</span></div>
+            <div class="card__body">
+              <span class="card__kicker">World Lobby</span>
+              <h3 class="card__title">世界大廳</h3>
+              <p class="card__excerpt">一顆顆漂浮的工具節點，進入 NESTIR 的世界。</p>
+              <span class="card__meta">進入 3D 空間 →</span>
+            </div>
+          </a>
+          <a class="card" href="receipt.html">
+            <div class="card__media card__media--cool"><span class="card__media-icon">🧾</span></div>
+            <div class="card__body">
+              <span class="card__kicker">Receipt SN</span>
+              <h3 class="card__title">單據夾</h3>
+              <p class="card__excerpt">把一張收據，變成一趟清楚安心的旅程。</p>
+              <span class="card__meta">開啟工具 →</span>
+            </div>
+          </a>
+          <a class="card" href="printshop.html">
+            <div class="card__media card__media--warm"><span class="card__media-icon">🖨️</span></div>
+            <div class="card__body">
+              <span class="card__kicker">3D Print Shop</span>
+              <h3 class="card__title">3D 打印店</h3>
+              <p class="card__excerpt">一盞燈、一隻皿、一件被溫柔對待的日常。</p>
+              <span class="card__meta">瀏覽作品 →</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="band__inner">
+        <p class="eyebrow" style="color:rgba(20,46,71,.6)">Humanity · Warmth · Hope</p>
+        <h2 class="band__title">願遠方的你，仍被人類的溫度照亮</h2>
+        <p class="band__sub">無論身在何處——偏遠的鄉間、繁忙的衛星城、前往宇宙的途中——都值得一個溫暖的家、一段有盼望的故事。</p>
+        <div style="margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a class="btn btn--amber" href="story.html">閱讀我們的 Story</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span class="site-footer__brand">NESTIR</span>
+      <span class="site-footer__copy">© 2024 by <b>Astro Journey to Satellite</b>. 一個安放身心、仍保有人類溫度的空間。</span>
+      <a class="site-footer__home" href="index.html">⌂ HOME</a>
+    </footer>
   </body>
 </html>

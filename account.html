@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#E9EAE7" />
+    <title>我的帳戶 · NESTIR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="src/site.css?v=20260901-3" />
+    <style>
+      .acct-panel { display: none; }
+      .acct-panel.is-open { display: block; }
+      .acct-card { border: 1px solid rgba(20,46,71,.10); border-radius: 20px; background: rgba(255,255,255,.55); padding: 26px; }
+      .acct-signin { border: 1px solid rgba(73,101,118,.18); background: linear-gradient(150deg, rgba(73,101,118,.08), rgba(201,162,75,.10)); border-radius: 20px; padding: 30px; text-align: center; }
+      .acct-ava { width: 54px; height: 54px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-size: 24px; font-weight: 750; }
+    </style>
+  </head>
+  <body>
+    <nav class="site-nav">
+      <a class="site-nav__brand" href="index.html"><span class="site-nav__compass" aria-hidden="true"><i></i></span><span>NESTIR</span></a>
+      <div class="site-nav__links">
+        <a class="site-nav__link" href="index.html">Home</a>
+        <a class="site-nav__link" href="story.html">Story</a>
+        <a class="site-nav__link" href="source.html">Source Share</a>
+        <a class="site-nav__link" href="myroom.html">My Room</a>
+        <a class="site-nav__link" href="printshop.html">3D Print Shop</a>
+        <a class="site-nav__link" href="wealth.html">全智富</a>
+        <a class="site-nav__link" href="words.html">Words</a>
+        <a class="site-nav__link site-nav__link--acct is-active" href="account.html">帳戶 <span aria-hidden="true">︿</span></a>
+      </div>
+    </nav>
+
+    <section class="section" style="padding-top:64px;max-width:920px">
+      <div class="section__inner">
+        <p class="eyebrow">Account Settings</p>
+        <h1 class="section-title" style="font-size:clamp(34px,5vw,52px)">你的帳戶</h1>
+        <p class="lead">關於你的資料、訂單與錢包，都在這裡。NESTIR 帳戶將讓你帶著每一個角落的溫暖前行。</p>
+
+        <div class="acct-tabs" style="margin-top:22px">
+          <button class="acct-tab is-active" data-tab="account">My Account</button>
+          <button class="acct-tab" data-tab="addresses">My Addresses</button>
+          <button class="acct-tab" data-tab="wallet">My Wallet</button>
+          <button class="acct-tab" data-tab="settings">Settings</button>
+        </div>
+
+        <div class="acct-signin">
+          <p class="eyebrow" style="margin-bottom:8px">Connect NESTIR Account</p>
+          <h2 style="font-family:var(--serif);font-weight:500;font-size:28px;margin:0 0 8px">登入，讓你的旅程被記住</h2>
+          <p class="muted" style="margin:0 0 22px">註冊或登入 NESTIR 帳戶，即可同步訂單、分享源檔，並使用世界大廳裡的工具。</p>
+          <a class="btn" href="https://account.studionestir.com/login" target="_blank" rel="noopener">登入 / 註冊 NESTIR Account →</a>
+        </div>
+
+        <div class="acct-card" style="margin-top:24px">
+          <div class="acct-panel is-open" data-panel="account">
+            <p class="eyebrow">Account</p>
+            <p class="muted" style="margin-top:0">查看並編輯你的個人資料。</p>
+            <div class="acct-grid">
+              <div>
+                <div class="field"><label>Display name *</label><input value="studionestirid" /></div>
+                <div class="field"><label>Title</label><input value="" placeholder="例如：住在 12m² 膠囊房的人" /></div>
+                <div class="field"><label>First name</label><input value="" /></div>
+                <div class="field"><label>Last name</label><input value="" /></div>
+                <div class="field"><label>Phone</label><input value="" placeholder="+852" /></div>
+              </div>
+              <div>
+                <div class="field"><label>Profile image</label><div class="acct-ava">N</div></div>
+              </div>
+            </div>
+            <div class="acct-actions">
+              <button class="btn btn--ghost">Discard</button>
+              <button class="btn">Update Info</button>
+            </div>
+          </div>
+
+          <div class="acct-panel" data-panel="addresses">
+            <p class="eyebrow">Addresses</p>
+            <p class="muted" style="margin-top:0">你寄送 3D 打印作品的收件地址。</p>
+            <div class="field"><label>收件地址</label><input value="" placeholder="衛星城 · 某區某街 12 號" /></div>
+            <div class="field"><label>國家 / 地區</label><input value="" placeholder="英國曼徹斯特 / 香港 / 中國大陸 …" /></div>
+            <div class="acct-actions"><button class="btn">Add Address</button></div>
+          </div>
+
+          <div class="acct-panel" data-panel="wallet">
+            <p class="eyebrow">Wallet</p>
+            <p class="muted" style="margin-top:0">你的訂閱、訂單與支付方式。</p>
+            <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+              <div class="card"><div class="card__body"><span class="card__kicker">訂閱</span><h3 class="card__title">我的訂閱</h3><span class="card__meta">0 個進行中</span></div></div>
+              <div class="card"><div class="card__body"><span class="card__kicker">訂單</span><h3 class="card__title">我的訂單</h3><span class="card__meta">0 筆</span></div></div>
+              <div class="card"><div class="card__body"><span class="card__kicker">支付</span><h3 class="card__title">支付方式</h3><span class="card__meta">未設定</span></div></div>
+            </div>
+          </div>
+
+          <div class="acct-panel" data-panel="settings">
+            <p class="eyebrow">Settings</p>
+            <p class="muted" style="margin-top:0">偏好、語言與通知。</p>
+            <div class="field"><label>語言</label><input value="繁體中文 (zh-Hant)" /></div>
+            <div class="field"><label>通知</label><input value="開啟溫暖提醒 與 新作品通知" /></div>
+            <div class="field"><label>顯示比例</label><input value="1.5x (可讀性)" /></div>
+            <div class="acct-actions"><button class="btn">Save Settings</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span class="site-footer__brand">NESTIR</span>
+      <span class="site-footer__copy">© 2024 by <b>Astro Journey to Satellite</b>. 一個安放身心、仍保有人類溫度的空間。</span>
+      <a class="site-footer__home" href="index.html">⌂ HOME</a>
+    </footer>
+
+    <script>
+      document.querySelectorAll('.acct-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var name = tab.getAttribute('data-tab');
+          document.querySelectorAll('.acct-tab').forEach(function (t) { t.classList.toggle('is-active', t === tab); });
+          document.querySelectorAll('.acct-panel').forEach(function (p) { p.classList.toggle('is-open', p.getAttribute('data-panel') === name); });
+        });
+      });
+    </script>
+  </body>
+</html>
