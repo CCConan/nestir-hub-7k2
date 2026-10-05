@@ -9,6 +9,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="src/site.css?v=20260901-3" />
+    <style>
+      .ps-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:26px; margin-top:34px; text-align:left; }
+      .ps-card { background:#fff; border:1px solid #E3E7E6; border-radius:18px; overflow:hidden;
+                 box-shadow:0 10px 26px rgba(20,46,71,.07); display:flex; flex-direction:column; }
+      .ps-hero { aspect-ratio:1/1; background:#F4F5F3; overflow:hidden; }
+      .ps-hero__img { width:100%; height:100%; object-fit:cover; display:block; }
+      .ps-body { padding:16px 16px 18px; }
+      .ps-name { font-family:'Poor Richard','Cormorant Garamond',serif; font-size:23px; margin:0 0 6px; color:#14202B; }
+      .ps-en { font-size:14px; color:#5A6B77; font-family:'Century Gothic',Futura,sans-serif; }
+      .ps-meta { font-size:14px; color:#3F5560; margin:0 0 12px; }
+      .ps-tag { display:inline-block; margin-left:6px; padding:2px 9px; border-radius:999px; background:#EAF1EE; color:#2F6B54; font-size:12px; }
+      .ps-thumbs { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+      .ps-thumb { padding:0; border:2px solid transparent; border-radius:10px; overflow:hidden; background:#F4F5F3; cursor:pointer; aspect-ratio:1/1; }
+      .ps-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+      .ps-thumb.is-on { border-color:#20415C; }
+      .ps-count { font-size:12px; color:#8A97A0; margin:10px 0 0; }
+    </style>
   </head>
   <body>
     <nav class="site-nav">
@@ -38,49 +55,244 @@
           <span class="acct-tab">我的訂單</span>
           <span class="acct-tab">KickStarter</span>
         </div>
-        <div class="product-grid">
-          <div class="product">
-            <div class="product__img"><span class="product__glow" style="--accent:#C9A24B"></span></div>
-            <div class="product__body">
-              <h3 class="product__name">星塵夜燈</h3>
-              <p class="product__price"><b>$ 480</b> · 可訂製</p>
+
+        <p class="eyebrow" style="margin-top:44px">Products · 16 款 · 相片 73 張</p>
+        <h2 class="section-title" style="font-size:clamp(28px,4vw,44px)">我們自己設計、自己打印的物件</h2>
+        <p class="lead" style="max-width:720px;margin:0 auto">以下每一件，都是 NESTIR 原創設計，於家中工房逐件打印。點縮圖可以換大圖。</p>
+        <div class="ps-grid">
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/magma-vase/01.jpg" alt="熔岩花瓶 Magma Vase"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">熔岩花瓶 <span class="ps-en">Magma Vase</span></h3>
+            <p class="ps-meta">絲滑黃銅 PLA · 家居擺設 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/magma-vase/01.jpg"><img loading="lazy" src="assets/products/magma-vase/01.jpg" alt="熔岩花瓶 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/magma-vase/02.jpg"><img loading="lazy" src="assets/products/magma-vase/02.jpg" alt="熔岩花瓶 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/magma-vase/03.jpg"><img loading="lazy" src="assets/products/magma-vase/03.jpg" alt="熔岩花瓶 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/magma-vase/04.jpg"><img loading="lazy" src="assets/products/magma-vase/04.jpg" alt="熔岩花瓶 相片 4"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/magma-vase/05.jpg"><img loading="lazy" src="assets/products/magma-vase/05.jpg" alt="熔岩花瓶 相片 5"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/magma-vase/06.jpg"><img loading="lazy" src="assets/products/magma-vase/06.jpg" alt="熔岩花瓶 相片 6"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/magma-vase/07.jpg"><img loading="lazy" src="assets/products/magma-vase/07.jpg" alt="熔岩花瓶 相片 7"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/magma-vase/08.jpg"><img loading="lazy" src="assets/products/magma-vase/08.jpg" alt="熔岩花瓶 相片 8"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/magma-vase/09.jpg"><img loading="lazy" src="assets/products/magma-vase/09.jpg" alt="熔岩花瓶 相片 9"></button>
             </div>
+            <p class="ps-count">相片 9 張</p>
           </div>
-          <div class="product">
-            <div class="product__img"><span class="product__glow" style="--accent:#496576"></span></div>
-            <div class="product__body">
-              <h3 class="product__name">遠山花瓶</h3>
-              <p class="product__price"><b>$ 320</b> · 限量</p>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/phone-stand/01.jpg" alt="手機座 PHONE Stand"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">手機座 <span class="ps-en">PHONE Stand</span></h3>
+            <p class="ps-meta">金屬感 PLA · 桌面配件 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/phone-stand/01.jpg"><img loading="lazy" src="assets/products/phone-stand/01.jpg" alt="手機座 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/phone-stand/02.jpg"><img loading="lazy" src="assets/products/phone-stand/02.jpg" alt="手機座 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/phone-stand/03.jpg"><img loading="lazy" src="assets/products/phone-stand/03.jpg" alt="手機座 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/phone-stand/04.jpg"><img loading="lazy" src="assets/products/phone-stand/04.jpg" alt="手機座 相片 4"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/phone-stand/05.jpg"><img loading="lazy" src="assets/products/phone-stand/05.jpg" alt="手機座 相片 5"></button>
             </div>
+            <p class="ps-count">相片 5 張</p>
           </div>
-          <div class="product">
-            <div class="product__img"><span class="product__glow" style="--accent:#347A5B"></span></div>
-            <div class="product__body">
-              <h3 class="product__name">獨處杯皿</h3>
-              <p class="product__price"><b>$ 210</b> · 常駐</p>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/switch2-mouse/01.jpg" alt="Switch 2 滑鼠外殼 Switch2 Mouse"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">Switch 2 滑鼠外殼 <span class="ps-en">Switch2 Mouse</span></h3>
+            <p class="ps-meta">PETG · 遊戲配件 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/switch2-mouse/01.jpg"><img loading="lazy" src="assets/products/switch2-mouse/01.jpg" alt="Switch 2 滑鼠外殼 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/switch2-mouse/02.jpg"><img loading="lazy" src="assets/products/switch2-mouse/02.jpg" alt="Switch 2 滑鼠外殼 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/switch2-mouse/03.jpg"><img loading="lazy" src="assets/products/switch2-mouse/03.jpg" alt="Switch 2 滑鼠外殼 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/switch2-mouse/04.jpg"><img loading="lazy" src="assets/products/switch2-mouse/04.jpg" alt="Switch 2 滑鼠外殼 相片 4"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/switch2-mouse/05.jpg"><img loading="lazy" src="assets/products/switch2-mouse/05.jpg" alt="Switch 2 滑鼠外殼 相片 5"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/switch2-mouse/06.jpg"><img loading="lazy" src="assets/products/switch2-mouse/06.jpg" alt="Switch 2 滑鼠外殼 相片 6"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/switch2-mouse/07.jpg"><img loading="lazy" src="assets/products/switch2-mouse/07.jpg" alt="Switch 2 滑鼠外殼 相片 7"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/switch2-mouse/08.jpg"><img loading="lazy" src="assets/products/switch2-mouse/08.jpg" alt="Switch 2 滑鼠外殼 相片 8"></button>
             </div>
+            <p class="ps-count">相片 8 張</p>
           </div>
-          <div class="product">
-            <div class="product__img"><span class="product__glow" style="--accent:#CC7A00"></span></div>
-            <div class="product__body">
-              <h3 class="product__name">衛星置物盤</h3>
-              <p class="product__price"><b>$ 350</b> · 新作</p>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/ams-number-tag/01.jpg" alt="AMS 編號標籤 AMS Number Tag"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">AMS 編號標籤 <span class="ps-en">AMS Number Tag</span></h3>
+            <p class="ps-meta">PLA · 3D 打印機配件 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/ams-number-tag/01.jpg"><img loading="lazy" src="assets/products/ams-number-tag/01.jpg" alt="AMS 編號標籤 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/ams-number-tag/02.jpg"><img loading="lazy" src="assets/products/ams-number-tag/02.jpg" alt="AMS 編號標籤 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/ams-number-tag/03.jpg"><img loading="lazy" src="assets/products/ams-number-tag/03.jpg" alt="AMS 編號標籤 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/ams-number-tag/04.jpg"><img loading="lazy" src="assets/products/ams-number-tag/04.jpg" alt="AMS 編號標籤 相片 4"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/ams-number-tag/05.jpg"><img loading="lazy" src="assets/products/ams-number-tag/05.jpg" alt="AMS 編號標籤 相片 5"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/ams-number-tag/06.jpg"><img loading="lazy" src="assets/products/ams-number-tag/06.jpg" alt="AMS 編號標籤 相片 6"></button>
             </div>
+            <p class="ps-count">相片 6 張</p>
           </div>
-          <div class="product">
-            <div class="product__img"><span class="product__glow" style="--accent:#7E94A3"></span></div>
-            <div class="product__body">
-              <h3 class="product__name">晨光燈座</h3>
-              <p class="product__price"><b>$ 520</b> · 訂製</p>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/deebot-ramp/01.jpg" alt="吸塵機械人斜台 DEEBOT Ramp"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">吸塵機械人斜台 <span class="ps-en">DEEBOT Ramp</span></h3>
+            <p class="ps-meta">PETG · 家居實用 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/deebot-ramp/01.jpg"><img loading="lazy" src="assets/products/deebot-ramp/01.jpg" alt="吸塵機械人斜台 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/deebot-ramp/02.jpg"><img loading="lazy" src="assets/products/deebot-ramp/02.jpg" alt="吸塵機械人斜台 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/deebot-ramp/03.jpg"><img loading="lazy" src="assets/products/deebot-ramp/03.jpg" alt="吸塵機械人斜台 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/deebot-ramp/04.jpg"><img loading="lazy" src="assets/products/deebot-ramp/04.jpg" alt="吸塵機械人斜台 相片 4"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/deebot-ramp/05.jpg"><img loading="lazy" src="assets/products/deebot-ramp/05.jpg" alt="吸塵機械人斜台 相片 5"></button>
             </div>
+            <p class="ps-count">相片 5 張</p>
           </div>
-          <div class="product">
-            <div class="product__img"><span class="product__glow" style="--accent:#A23C3C"></span></div>
-            <div class="product__body">
-              <h3 class="product__name">同行對杯</h3>
-              <p class="product__price"><b>$ 380</b> · 限量</p>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/keyboard-stand/01.jpg" alt="鍵盤座 Keyboard Stand"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">鍵盤座 <span class="ps-en">Keyboard Stand</span></h3>
+            <p class="ps-meta">PLA／PETG · 桌面配件 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/keyboard-stand/01.jpg"><img loading="lazy" src="assets/products/keyboard-stand/01.jpg" alt="鍵盤座 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/keyboard-stand/02.jpg"><img loading="lazy" src="assets/products/keyboard-stand/02.jpg" alt="鍵盤座 相片 2"></button>
             </div>
+            <p class="ps-count">相片 2 張</p>
           </div>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/dish-rack/01.jpg" alt="碟架 Dish Rack"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">碟架 <span class="ps-en">Dish Rack</span></h3>
+            <p class="ps-meta">PETG · 家居實用 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/dish-rack/01.jpg"><img loading="lazy" src="assets/products/dish-rack/01.jpg" alt="碟架 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/dish-rack/02.jpg"><img loading="lazy" src="assets/products/dish-rack/02.jpg" alt="碟架 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/dish-rack/03.jpg"><img loading="lazy" src="assets/products/dish-rack/03.jpg" alt="碟架 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/dish-rack/04.jpg"><img loading="lazy" src="assets/products/dish-rack/04.jpg" alt="碟架 相片 4"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/dish-rack/05.jpg"><img loading="lazy" src="assets/products/dish-rack/05.jpg" alt="碟架 相片 5"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/dish-rack/06.jpg"><img loading="lazy" src="assets/products/dish-rack/06.jpg" alt="碟架 相片 6"></button>
+            </div>
+            <p class="ps-count">相片 6 張</p>
+          </div>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/folding-knife/01.jpg" alt="折疊刀（簡化版） Folding Utility Blade"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">折疊刀（簡化版） <span class="ps-en">Folding Utility Blade</span></h3>
+            <p class="ps-meta">PETG · 工具 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/folding-knife/01.jpg"><img loading="lazy" src="assets/products/folding-knife/01.jpg" alt="折疊刀（簡化版） 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/folding-knife/02.jpg"><img loading="lazy" src="assets/products/folding-knife/02.jpg" alt="折疊刀（簡化版） 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/folding-knife/03.jpg"><img loading="lazy" src="assets/products/folding-knife/03.jpg" alt="折疊刀（簡化版） 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/folding-knife/04.jpg"><img loading="lazy" src="assets/products/folding-knife/04.jpg" alt="折疊刀（簡化版） 相片 4"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/folding-knife/05.jpg"><img loading="lazy" src="assets/products/folding-knife/05.jpg" alt="折疊刀（簡化版） 相片 5"></button>
+            </div>
+            <p class="ps-count">相片 5 張</p>
+          </div>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/car-key/01.jpg" alt="車匙套 Car Key Case"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">車匙套 <span class="ps-en">Car Key Case</span></h3>
+            <p class="ps-meta">隨身配件 <span class="ps-tag">開發中</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/car-key/01.jpg"><img loading="lazy" src="assets/products/car-key/01.jpg" alt="車匙套 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/car-key/02.jpg"><img loading="lazy" src="assets/products/car-key/02.jpg" alt="車匙套 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/car-key/03.jpg"><img loading="lazy" src="assets/products/car-key/03.jpg" alt="車匙套 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/car-key/04.jpg"><img loading="lazy" src="assets/products/car-key/04.jpg" alt="車匙套 相片 4"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/car-key/05.jpg"><img loading="lazy" src="assets/products/car-key/05.jpg" alt="車匙套 相片 5"></button>
+            </div>
+            <p class="ps-count">相片 5 張</p>
+          </div>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/christmas-card/01.jpg" alt="聖誕樹穿洞摺疊卡 Christmas Pop-up Card"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">聖誕樹穿洞摺疊卡 <span class="ps-en">Christmas Pop-up Card</span></h3>
+            <p class="ps-meta">PETG · 節日限定 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/christmas-card/01.jpg"><img loading="lazy" src="assets/products/christmas-card/01.jpg" alt="聖誕樹穿洞摺疊卡 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/christmas-card/02.jpg"><img loading="lazy" src="assets/products/christmas-card/02.jpg" alt="聖誕樹穿洞摺疊卡 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/christmas-card/03.jpg"><img loading="lazy" src="assets/products/christmas-card/03.jpg" alt="聖誕樹穿洞摺疊卡 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/christmas-card/04.jpg"><img loading="lazy" src="assets/products/christmas-card/04.jpg" alt="聖誕樹穿洞摺疊卡 相片 4"></button>
+            </div>
+            <p class="ps-count">相片 4 張</p>
+          </div>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/hook/01.jpg" alt="金屬架轉接掛鉤 Adapter Hook"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">金屬架轉接掛鉤 <span class="ps-en">Adapter Hook</span></h3>
+            <p class="ps-meta">PETG · 家居實用 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/hook/01.jpg"><img loading="lazy" src="assets/products/hook/01.jpg" alt="金屬架轉接掛鉤 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/hook/02.jpg"><img loading="lazy" src="assets/products/hook/02.jpg" alt="金屬架轉接掛鉤 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/hook/03.jpg"><img loading="lazy" src="assets/products/hook/03.jpg" alt="金屬架轉接掛鉤 相片 3"></button>
+            </div>
+            <p class="ps-count">相片 3 張</p>
+          </div>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/switch-grip/01.jpg" alt="Switch 手柄握把 Switch Comfort Grip"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">Switch 手柄握把 <span class="ps-en">Switch Comfort Grip</span></h3>
+            <p class="ps-meta">PETG · 遊戲配件 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/switch-grip/01.jpg"><img loading="lazy" src="assets/products/switch-grip/01.jpg" alt="Switch 手柄握把 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/switch-grip/02.jpg"><img loading="lazy" src="assets/products/switch-grip/02.jpg" alt="Switch 手柄握把 相片 2"></button>
+            </div>
+            <p class="ps-count">相片 2 張</p>
+          </div>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/mighty-stand/01.jpg" alt="Mighty+ 底座 Vaporizer Stand"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">Mighty+ 底座 <span class="ps-en">Vaporizer Stand</span></h3>
+            <p class="ps-meta">PLA · 桌面收納 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/mighty-stand/01.jpg"><img loading="lazy" src="assets/products/mighty-stand/01.jpg" alt="Mighty+ 底座 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/mighty-stand/02.jpg"><img loading="lazy" src="assets/products/mighty-stand/02.jpg" alt="Mighty+ 底座 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/mighty-stand/03.jpg"><img loading="lazy" src="assets/products/mighty-stand/03.jpg" alt="Mighty+ 底座 相片 3"></button>
+            </div>
+            <p class="ps-count">相片 3 張</p>
+          </div>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/headphone-ring/01.jpg" alt="耳機環套 Headphone Ring"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">耳機環套 <span class="ps-en">Headphone Ring</span></h3>
+            <p class="ps-meta">桌面收納 <span class="ps-tag">開發中</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/headphone-ring/01.jpg"><img loading="lazy" src="assets/products/headphone-ring/01.jpg" alt="耳機環套 相片 1"></button>
+            </div>
+            <p class="ps-count">相片 1 張</p>
+          </div>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/fanko-pod-holder/01.jpg" alt="煙彈架 Pod Holder"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">煙彈架 <span class="ps-en">Pod Holder</span></h3>
+            <p class="ps-meta">FANKO 系列 · 收納 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/fanko-pod-holder/01.jpg"><img loading="lazy" src="assets/products/fanko-pod-holder/01.jpg" alt="煙彈架 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/fanko-pod-holder/02.jpg"><img loading="lazy" src="assets/products/fanko-pod-holder/02.jpg" alt="煙彈架 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/fanko-pod-holder/03.jpg"><img loading="lazy" src="assets/products/fanko-pod-holder/03.jpg" alt="煙彈架 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/fanko-pod-holder/04.jpg"><img loading="lazy" src="assets/products/fanko-pod-holder/04.jpg" alt="煙彈架 相片 4"></button>
+            </div>
+            <p class="ps-count">相片 4 張</p>
+          </div>
+        </article>
+        <article class="ps-card">
+          <div class="ps-hero"><img loading="lazy" class="ps-hero__img" src="assets/products/fanko-dart-holder/01.jpg" alt="飛鏢插座／掛牆 Dart Holder"></div>
+          <div class="ps-body">
+            <h3 class="ps-name">飛鏢插座／掛牆 <span class="ps-en">Dart Holder</span></h3>
+            <p class="ps-meta">FANKO 系列 · 收納 <span class="ps-tag">可訂製</span></p>
+            <div class="ps-thumbs">
+              <button type="button" class="ps-thumb is-on" data-src="assets/products/fanko-dart-holder/01.jpg"><img loading="lazy" src="assets/products/fanko-dart-holder/01.jpg" alt="飛鏢插座／掛牆 相片 1"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/fanko-dart-holder/02.jpg"><img loading="lazy" src="assets/products/fanko-dart-holder/02.jpg" alt="飛鏢插座／掛牆 相片 2"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/fanko-dart-holder/03.jpg"><img loading="lazy" src="assets/products/fanko-dart-holder/03.jpg" alt="飛鏢插座／掛牆 相片 3"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/fanko-dart-holder/04.jpg"><img loading="lazy" src="assets/products/fanko-dart-holder/04.jpg" alt="飛鏢插座／掛牆 相片 4"></button>
+              <button type="button" class="ps-thumb" data-src="assets/products/fanko-dart-holder/05.jpg"><img loading="lazy" src="assets/products/fanko-dart-holder/05.jpg" alt="飛鏢插座／掛牆 相片 5"></button>
+            </div>
+            <p class="ps-count">相片 5 張</p>
+          </div>
+        </article>
         </div>
       </div>
     </section>
@@ -102,5 +314,15 @@
       <span class="site-footer__copy">© 2024 by <b>Astro Journey to Satellite</b>. 一個安放身心、仍保有人類溫度的空間。</span>
       <a class="site-footer__home" href="index.html">⌂ HOME</a>
     </footer>
+
+    <script>
+      document.addEventListener('click', function (e) {
+        const t = e.target.closest('.ps-thumb');
+        if (!t) return;
+        const card = t.closest('.ps-card');
+        card.querySelector('.ps-hero__img').src = t.dataset.src;
+        card.querySelectorAll('.ps-thumb').forEach(b => b.classList.toggle('is-on', b === t));
+      });
+    </script>
   </body>
 </html>
