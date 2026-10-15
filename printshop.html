@@ -22,6 +22,7 @@
     <meta name="twitter:title" content="3D Print Shop · NESTIR" />
     <meta name="twitter:description" content="自家設計、自家打印 —— 17 款 3D 打印產品：桌面配件、家居收納、工具周邊與 FANKO 系列，全部可訂製。" />
     <meta name="twitter:image" content="https://world.studionestir.com/assets/og/og-printshop.png" />
+    <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "10443b43f35b4bc6a87251984fc93068"}'></script>
     <!-- seo:end -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -702,7 +703,7 @@
           }
           var copy = e.target.closest('.ps-copy');
           if (copy) {
-            var url = location.origin + location.pathname + '#p-' + copy.dataset.slug;
+            var url = location.origin + '/shop/' + copy.dataset.slug + '.html';
             var ok = copy.parentElement.querySelector('.ps-copy__ok');
             var show = function () { ok.hidden = false; setTimeout(function () { ok.hidden = true; }, 1600); };
             if (navigator.clipboard && navigator.clipboard.writeText) {
