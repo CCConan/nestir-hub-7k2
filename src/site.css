@@ -85,6 +85,13 @@ img { max-width: 100%; display: block; }
   background:
     radial-gradient(120% 80% at 50% 0%, #E9EAE7 0%, #D7DCDD 42%, #C6CFD3 72%, #AEBBC4 100%);
 }
+/* WebGPU 大理石背景（漸進增强：冇 WebGPU 就保持上面嘅漸層） */
+.site-hero__scene.has-shader { background: #eef1f3; }
+.site-hero__scene.has-shader > canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  opacity: 0; transition: opacity .9s ease;
+}
+.site-hero__scene.shader-ready > canvas { opacity: 1; }
 .site-hero__window {
   position: absolute; left: 50%; bottom: -14%; transform: translateX(-50%);
   width: min(720px, 92vw); height: 76%;
